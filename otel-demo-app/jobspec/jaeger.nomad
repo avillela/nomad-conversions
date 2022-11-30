@@ -7,47 +7,28 @@ job "jaeger" {
     network {
       mode = "bridge"
 
-      port "jaeger-ui" {
+      port "frontend" {
         to = 16686
       }
-      port "jaeger-collector" {
-        to = 14268
-      }
-
-      port "jaeger-proto" {
-        to = 14250
-      }
-
-      port "jaeger-grpc" {
-        to = 16685
+      port "collector" {
+        to = 4317
       }
 
     }
 
     service {
-      name = "jaeger-proto"
-      tags = [
-        "traefik.tcp.routers.jaeger-proto.rule=HostSNI(`*`)",
-        "traefik.tcp.routers.jaeger-proto.entrypoints=grpc",
-        "traefik.enable=true",
-      ]        
-
-      port = "jaeger-proto"
-    }
-
-    service {
-      name = "jaeger-grpc"
+      name = "jaeger-collector"
       tags = [
         "traefik.tcp.routers.jaeger-grpc.rule=HostSNI(`*`)",
         "traefik.tcp.routers.jaeger-grpc.entrypoints=grpc",
         "traefik.enable=true",
       ]        
 
-      port = "jaeger-grpc"
+      port = "collector"
     }
 
     service {
-      name = "jaeger-ui"
+      name = "jaeger-frontend"
       tags = [
         "traefik.http.routers.jaeger-ui.rule=Host(`jaeger-ui.localhost`)",
         "traefik.http.routers.jaeger-ui.entrypoints=web",
@@ -55,7 +36,7 @@ job "jaeger" {
         "traefik.enable=true",
       ]
 
-      port = "jaeger-ui"
+      port = "frontend"
     }
 
 
@@ -63,13 +44,16 @@ job "jaeger" {
       driver = "docker"
 
       config {
-        image = "jaegertracing/all-in-one:1.35.1"
-        // image = "jaegertracing/all-in-one:1.33"
-        ports = ["jaeger-ui", "jaeger-collector"]
+        image = "jaegertracing/all-in-one:latest"
+        args = [
+            "--memory.max-traces", "10000",
+            "--query.base-path", "/jaeger/ui"          
+        ]
+        ports = ["frontend", "collector"]
       }
 
       env {
-        SPAN_STORAGE_TYPE = "memory"
+        COLLECTOR_OTLP_ENABLED = "true"
       }
 
       resources {

@@ -8,10 +8,10 @@ job "featureflagservice" {
     network {
       mode = "host"
 
-      port "containerport" {
+      port "http" {
         to = 8081
       }
-      port "containerport-grpc" {
+      port "grpc" {
         to = 50053
       }
     }
@@ -25,7 +25,7 @@ job "featureflagservice" {
         "traefik.enable=true",
       ]
 
-      port = "containerport"
+      port = "http"
 
       check {
         type     = "tcp"
@@ -41,7 +41,7 @@ job "featureflagservice" {
         "traefik.tcp.routers.featureflagservice-grpc.entrypoints=grpc",
         "traefik.enable=true",
       ]        
-      port = "containerport-grpc"
+      port = "grpc"
     }
 
     task "featureflagservice" {
@@ -50,10 +50,10 @@ job "featureflagservice" {
       config {
         image = "otel/demo:v1.1.0-featureflagservice"
 
-        ports = ["containerport", "containerport-grpc"]
+        ports = ["http", "grpc"]
       }
       env {
-        DATABASE_URL = "ecto://ffs:ffs@ffspostgres.localhost:80/ffs"
+        DATABASE_URL = "ecto://ffs:ffs@ffspostgres.localhost/ffs"
         FEATURE_FLAG_GRPC_SERVICE_PORT = "50053"
         FEATURE_FLAG_SERVICE_PATH_ROOT = "\"/feature\""
         FEATURE_FLAG_SERVICE_PORT = "8081"

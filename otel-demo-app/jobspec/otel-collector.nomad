@@ -15,13 +15,15 @@ job "otel-collector" {
     count = 1
     network {
       mode = "host"
-      port "healthcheck" {
-        to = 13133
+
+      port "jaeger-compact" {
+        to = 6831
+        // UDP???
       }
       port "jaeger-grpc" {
         to = 14250
       }
-      port "jaeger-thrift-http" {
+      port "jaeger-thrift" {
         to = 14268
       }
       port "metrics" {
@@ -30,18 +32,18 @@ job "otel-collector" {
       port "otlp" {
         to = 4317
       }
-      port "otlphttp" {
+      port "otlp-http" {
         to = 4318
+      }
+      port "prometheus" {
+        to = 9464
       }
       port "zipkin" {
         to = 9411
       }
-      port "zpages" {
-        to = 55679
-      }
+      
     }
 
-    
     task "otel-collector" {
       driver = "docker"
 
@@ -50,31 +52,19 @@ job "otel-collector" {
 
         entrypoint = [
           "/otelcol-contrib",
-          "--config=local/config/otel-collector-config.yaml",
+          "--config=/etc/otelcol-config.yml",
         ]
         ports = [
-  "otlphttp",
-  "zipkin",
-  "zpages",
-  "healthcheck",
-  "jaeger-grpc",
-  "jaeger-thrift-http",
-  "metrics",
-  "otlp"
-]
-
-        
-
+          "jaeger-compact",
+          "jaeger-grpc",
+          "jaeger-thrift",
+          "metrics",
+          "otlp",
+          "otlp-http",
+          "prometheus",
+          "zipkin"
+        ]
       }
-
-      env {
-        HOST_DEV = "/hostfs/dev"
-        HOST_ETC = "/hostfs/etc"
-        HOST_PROC = "/hostfs/proc"
-        HOST_RUN = "/hostfs/run"
-        HOST_SYS = "/hostfs/sys"
-        HOST_VAR = "/hostfs/var"
-    }
 
       template {
         data = <<EOH
@@ -113,58 +103,34 @@ service:
 EOH
 
         change_mode   = "restart"
-        destination = "local/config/otel-collector-config.yaml"
+        destination = "/etc/otelcol-config.yml"
       }
-
-      
 
       resources {
         cpu    = 256
         memory = 512
       }
-      service {
-        provider = "nomad"
-        name = "opentelemetry-collector"
-        port = "metrics"
-        tags = ["prometheus"]
-      }
-      service {
-        provider = "nomad"
-        name = "opentelemetry-collector"
-        port = "zipkin"
-        tags = ["zipkin"]
-      }
-      // service {
-      //   name = "opentelemetry-collector"
-      //   port = "healthcheck"
-      //   tags = ["health"]
-      //   check {
-      //     type     = "http"
-      //     path     = "/"
-      //     interval = "15s"
-      //     timeout  = "3s"
-      //   }
-      // }
-      service {
-        provider = "nomad"
-        name = "opentelemetry-collector"
-        port = "jaeger-grpc"
-        tags = ["jaeger-grpc"]
-      }
-      service {
-        provider = "nomad"
-        name = "opentelemetry-collector"
-        port = "jaeger-thrift-http"
-        tags = ["jaeger-thrift-http"]
-      }
-      service {
-        provider = "nomad"
-        name = "opentelemetry-collector"
-        port = "zpages"
-        tags = ["zpages"]
-      }
 
-      
+      service {
+        provider = "nomad"
+        port = "jaeger-compact"
+        tags = ["jaeger"]
+      }
+      service {
+        provider = "nomad"
+        port = "jaeger-grpc"
+        tags = ["jaeger"]
+      }
+      service {
+        provider = "nomad"
+        port = "jaeger-thrift"
+        tags = ["jaeger"]
+      }
+      service {
+        provider = "nomad"
+        port = "metrics"
+        tags = ["metrics"]
+      }
       service {
         provider = "nomad"
         tags = [
@@ -174,7 +140,6 @@ EOH
         ]        
         port = "otlp"
       }
-
       service {
         provider = "nomad"
         tags = [
@@ -183,9 +148,18 @@ EOH
           "traefik.http.routers.otel-collector-http.tls=false",
           "traefik.enable=true",
         ]
-        port = "otlphttp"
+        port = "otlp-http"
       }
-
+      service {
+        provider = "nomad"
+        port = "prometheus"
+        tags = ["metrics"]
+      }      
+      service {
+        provider = "nomad"
+        port = "zipkin"
+        tags = ["zipkin"]
+      }
     }
   }
 }

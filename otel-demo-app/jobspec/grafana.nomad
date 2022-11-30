@@ -53,15 +53,19 @@ job "grafana" {
         ports = ["http"]
       }
       artifact {
-        source      = "github.com/lightstep/opentelemetry-demo/src/grafana/provisioning"
+        source      = "github.com/open-telemetry/opentelemetry-demo/src/grafana/provisioning"
         destination = "/etc/grafana/provisioning"
       }
 
       artifact {
-        source      = "github.com/lightstep/opentelemetry-demo/src/grafana/grafana.ini"
+        source      = "github.com/open-telemetry/opentelemetry-demo/src/grafana/grafana.ini"
         destination = "/etc/grafana/grafana.ini"
       }
+
       env {
+        GF_PATHS_DATA = "/var/lib/grafana/"
+        GF_PATHS_LOGS = "/var/log/grafana"
+        GF_PATHS_PLUGINS = "/var/lib/grafana/plugins"
         GF_LOG_LEVEL = "DEBUG"
         GF_LOG_MODE = "console"
         GF_SERVER_HTTP_PORT = "${NOMAD_PORT_http}"
