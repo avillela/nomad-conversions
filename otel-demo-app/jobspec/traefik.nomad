@@ -60,12 +60,6 @@ job "traefik" {
       }
     }
 
-    // service {
-    //   name = "traefik-http"
-    //   provider = "nomad"
-    //   port = "http"
-    // }
-
     task "server" {
       driver = "docker"
       config {

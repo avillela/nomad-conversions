@@ -6,6 +6,7 @@ job "otel-collector" {
 
   type = "service"
 
+  
   constraint {
     attribute = "${attr.kernel.name}"
     value     = "linux"
@@ -15,7 +16,9 @@ job "otel-collector" {
     count = 1
     network {
       mode = "host"
-
+      port "healthcheck" {
+        to = 13133
+      }
       port "jaeger-compact" {
         to = 6831
         // UDP???
@@ -41,30 +44,40 @@ job "otel-collector" {
       port "zipkin" {
         to = 9411
       }
-      
     }
 
+    
     task "otel-collector" {
       driver = "docker"
 
       config {
-        image = "otel/opentelemetry-collector-contrib:0.61.0"
+        image = "otel/opentelemetry-collector-contrib:0.64.1"
 
         entrypoint = [
           "/otelcol-contrib",
-          "--config=/etc/otelcol-config.yml",
+          "--config=local/config/otel-collector-config.yaml",
         ]
         ports = [
+          "otlp-http",
+          "zipkin",
+          "healthcheck",
           "jaeger-compact",
           "jaeger-grpc",
           "jaeger-thrift",
-          "metrics",
-          "otlp",
-          "otlp-http",
           "prometheus",
-          "zipkin"
+          "metrics",
+          "otlp"
         ]
       }
+
+      env {
+        HOST_DEV = "/hostfs/dev"
+        HOST_ETC = "/hostfs/etc"
+        HOST_PROC = "/hostfs/proc"
+        HOST_RUN = "/hostfs/run"
+        HOST_SYS = "/hostfs/sys"
+        HOST_VAR = "/hostfs/var"
+    }
 
       template {
         data = <<EOH
@@ -87,7 +100,7 @@ processors:
 
 exporters:
   logging:
-    logLevel: debug
+    verbosity: detailed
 
   otlp/ls:
     endpoint: ingest.lightstep.com:443
@@ -103,33 +116,48 @@ service:
 EOH
 
         change_mode   = "restart"
-        destination = "/etc/otelcol-config.yml"
+        destination = "local/config/otel-collector-config.yaml"
       }
 
-      resources {
-        cpu    = 256
-        memory = 512
-      }
-
+      // resources {
+      //   cpu    = 256
+      //   memory = 512
+      // }
       service {
         provider = "nomad"
-        port = "jaeger-compact"
-        tags = ["jaeger"]
-      }
-      service {
-        provider = "nomad"
-        port = "jaeger-grpc"
-        tags = ["jaeger"]
-      }
-      service {
-        provider = "nomad"
-        port = "jaeger-thrift"
-        tags = ["jaeger"]
-      }
-      service {
-        provider = "nomad"
+        name = "opentelemetry-collector"
         port = "metrics"
         tags = ["metrics"]
+      }
+      service {
+        provider = "nomad"
+        name = "opentelemetry-collector"
+        port = "prometheus"
+        tags = ["prometheus"]
+      }      
+      service {
+        provider = "nomad"
+        name = "opentelemetry-collector"
+        port = "zipkin"
+        tags = ["zipkin"]
+      }
+      service {
+        provider = "nomad"
+        name = "opentelemetry-collector"
+        port = "jaeger-compact"
+        tags = ["jaeger-compact"]
+      }
+      service {
+        provider = "nomad"
+        name = "opentelemetry-collector"
+        port = "jaeger-grpc"
+        tags = ["jaeger-grpc"]
+      }
+      service {
+        provider = "nomad"
+        name = "opentelemetry-collector"
+        port = "jaeger-thrift"
+        tags = ["jaeger-thrift"]
       }
       service {
         provider = "nomad"
@@ -140,6 +168,7 @@ EOH
         ]        
         port = "otlp"
       }
+
       service {
         provider = "nomad"
         tags = [
@@ -150,16 +179,7 @@ EOH
         ]
         port = "otlp-http"
       }
-      service {
-        provider = "nomad"
-        port = "prometheus"
-        tags = ["metrics"]
-      }      
-      service {
-        provider = "nomad"
-        port = "zipkin"
-        tags = ["zipkin"]
-      }
+
     }
   }
 }

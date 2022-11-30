@@ -9,7 +9,7 @@ job "redis" {
       mode = "host"
 
       port "db" {
-        to = 6379
+        static = 6379
       }
     }
 
@@ -41,10 +41,10 @@ job "redis" {
         ports = ["db"]
       }
 
-      resources {
-        cpu    = 500
-        memory = 256
-      }
+      // resources {
+      //   cpu    = 500
+      //   memory = 256
+      // }
 
     }
   }
