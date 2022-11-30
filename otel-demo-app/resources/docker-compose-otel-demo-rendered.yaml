@@ -1,0 +1,717 @@
+name: opentelemetry-demo
+services:
+  adservice:
+    build:
+      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo
+      dockerfile: ./src/adservice/Dockerfile
+      cache_from:
+      - ghcr.io/open-telemetry/demo:v1.1.0-adservice
+    container_name: ad-service
+    depends_on:
+      otelcol:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: "314572800"
+    environment:
+      AD_SERVICE_PORT: "9555"
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://otelcol:4317
+      OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE: cumulative
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otelcol:4317
+      OTEL_SERVICE_NAME: adservice
+    image: ghcr.io/open-telemetry/demo:v1.1.0-adservice
+    logging:
+      driver: json-file
+      options:
+        max-file: "2"
+        max-size: 5m
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 9555
+      protocol: tcp
+    restart: always
+  cartservice:
+    build:
+      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo
+      dockerfile: ./src/cartservice/src/Dockerfile
+      cache_from:
+      - ghcr.io/open-telemetry/demo:v1.1.0-cartservice
+    container_name: cart-service
+    depends_on:
+      otelcol:
+        condition: service_started
+      redis-cart:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: "167772160"
+    environment:
+      ASPNETCORE_URLS: http://*:7070
+      CART_SERVICE_PORT: "7070"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otelcol:4317
+      OTEL_SERVICE_NAME: cartservice
+      REDIS_ADDR: redis-cart:6379
+    image: ghcr.io/open-telemetry/demo:v1.1.0-cartservice
+    logging:
+      driver: json-file
+      options:
+        max-file: "2"
+        max-size: 5m
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 7070
+      protocol: tcp
+    restart: always
+  checkoutservice:
+    build:
+      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo
+      dockerfile: ./src/checkoutservice/Dockerfile
+      cache_from:
+      - ghcr.io/open-telemetry/demo:v1.1.0-checkoutservice
+    container_name: checkout-service
+    depends_on:
+      cartservice:
+        condition: service_started
+      currencyservice:
+        condition: service_started
+      emailservice:
+        condition: service_started
+      otelcol:
+        condition: service_started
+      paymentservice:
+        condition: service_started
+      productcatalogservice:
+        condition: service_started
+      shippingservice:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: "20971520"
+    environment:
+      CART_SERVICE_ADDR: cartservice:7070
+      CHECKOUT_SERVICE_PORT: "5050"
+      CURRENCY_SERVICE_ADDR: currencyservice:7001
+      EMAIL_SERVICE_ADDR: http://emailservice:6060
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://otelcol:4317
+      OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE: cumulative
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otelcol:4317
+      OTEL_SERVICE_NAME: checkoutservice
+      PAYMENT_SERVICE_ADDR: paymentservice:50051
+      PRODUCT_CATALOG_SERVICE_ADDR: productcatalogservice:3550
+      SHIPPING_SERVICE_ADDR: shippingservice:50050
+    image: ghcr.io/open-telemetry/demo:v1.1.0-checkoutservice
+    logging:
+      driver: json-file
+      options:
+        max-file: "2"
+        max-size: 5m
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 5050
+      protocol: tcp
+    restart: always
+  currencyservice:
+    build:
+      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo/src/currencyservice
+      dockerfile: Dockerfile
+      args:
+        GRPC_VERSION: 1.46.0
+        OPENTELEMETRY_VERSION: 1.5.0
+      cache_from:
+      - ghcr.io/open-telemetry/demo:v1.1.0-currencyservice
+    container_name: currency-service
+    depends_on:
+      otelcol:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: "20971520"
+    environment:
+      CURRENCY_SERVICE_PORT: "7001"
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otelcol:4317
+      OTEL_RESOURCE_ATTRIBUTES: service.name=currencyservice
+    image: ghcr.io/open-telemetry/demo:v1.1.0-currencyservice
+    logging:
+      driver: json-file
+      options:
+        max-file: "2"
+        max-size: 5m
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 7001
+      protocol: tcp
+    restart: always
+  emailservice:
+    build:
+      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo/src/emailservice
+      dockerfile: Dockerfile
+      cache_from:
+      - ghcr.io/open-telemetry/demo:v1.1.0-emailservice
+    container_name: email-service
+    depends_on:
+      otelcol:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: "104857600"
+    environment:
+      APP_ENV: production
+      EMAIL_SERVICE_PORT: "6060"
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otelcol:4318/v1/traces
+      OTEL_SERVICE_NAME: emailservice
+    image: ghcr.io/open-telemetry/demo:v1.1.0-emailservice
+    logging:
+      driver: json-file
+      options:
+        max-file: "2"
+        max-size: 5m
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 6060
+      protocol: tcp
+    restart: always
+  featureflagservice:
+    build:
+      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo
+      dockerfile: ./src/featureflagservice/Dockerfile
+      cache_from:
+      - ghcr.io/open-telemetry/demo:v1.1.0-featureflagservice
+    container_name: feature-flag-service
+    depends_on:
+      ffs_postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: "209715200"
+    environment:
+      DATABASE_URL: ecto://ffs:ffs@ffs_postgres:5432/ffs
+      FEATURE_FLAG_GRPC_SERVICE_PORT: "50053"
+      FEATURE_FLAG_SERVICE_PATH_ROOT: '"/feature"'
+      FEATURE_FLAG_SERVICE_PORT: "8081"
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otelcol:4317
+      OTEL_EXPORTER_OTLP_TRACES_PROTOCOL: grpc
+      OTEL_SERVICE_NAME: featureflagservice
+    image: ghcr.io/open-telemetry/demo:v1.1.0-featureflagservice
+    logging:
+      driver: json-file
+      options:
+        max-file: "2"
+        max-size: 5m
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 8081
+      protocol: tcp
+    - mode: ingress
+      target: 50053
+      protocol: tcp
+    restart: always
+  ffs_postgres:
+    container_name: postgres
+    deploy:
+      resources:
+        limits:
+          memory: "125829120"
+    environment:
+      POSTGRES_DB: ffs
+      POSTGRES_PASSWORD: ffs
+      POSTGRES_USER: ffs
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - pg_isready -d ffs -U ffs
+      timeout: 5s
+      interval: 10s
+      retries: 5
+    image: postgres:14
+    logging:
+      driver: json-file
+      options:
+        max-file: "2"
+        max-size: 5m
+    networks:
+      default: null
+    restart: always
+  frontend:
+    build:
+      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo
+      dockerfile: ./src/frontend/Dockerfile
+      cache_from:
+      - ghcr.io/open-telemetry/demo:v1.1.0-frontend
+    container_name: frontend
+    depends_on:
+      adservice:
+        condition: service_started
+      cartservice:
+        condition: service_started
+      checkoutservice:
+        condition: service_started
+      currencyservice:
+        condition: service_started
+      otelcol:
+        condition: service_started
+      productcatalogservice:
+        condition: service_started
+      quoteservice:
+        condition: service_started
+      recommendationservice:
+        condition: service_started
+      shippingservice:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: "209715200"
+    environment:
+      AD_SERVICE_ADDR: adservice:9555
+      CART_SERVICE_ADDR: cartservice:7070
+      CHECKOUT_SERVICE_ADDR: checkoutservice:5050
+      CURRENCY_SERVICE_ADDR: currencyservice:7001
+      ENV_PLATFORM: local
+      FRONTEND_ADDR: frontend:8080
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otelcol:4317
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otelcol:4317
+      OTEL_RESOURCE_ATTRIBUTES: service.name=frontend
+      OTEL_SERVICE_NAME: frontend
+      PORT: "8080"
+      PRODUCT_CATALOG_SERVICE_ADDR: productcatalogservice:3550
+      PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://localhost:4318/v1/traces
+      RECOMMENDATION_SERVICE_ADDR: recommendationservice:9001
+      SHIPPING_SERVICE_ADDR: shippingservice:50050
+    image: ghcr.io/open-telemetry/demo:v1.1.0-frontend
+    logging:
+      driver: json-file
+      options:
+        max-file: "2"
+        max-size: 5m
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 8080
+      protocol: tcp
+    restart: always
+  frontendproxy:
+    build:
+      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo
+      dockerfile: src/frontendproxy/Dockerfile
+    container_name: frontend-proxy
+    depends_on:
+      featureflagservice:
+        condition: service_started
+      frontend:
+        condition: service_started
+      grafana:
+        condition: service_started
+      loadgenerator:
+        condition: service_started
+    environment:
+      ENVOY_PORT: "8080"
+      ENVOY_UID: "0"
+      FEATURE_FLAG_SERVICE_HOST: feature-flag-service
+      FEATURE_FLAG_SERVICE_PORT: "8081"
+      FRONTEND_HOST: frontend
+      FRONTEND_PORT: "8080"
+      GRAFANA_SERVICE_HOST: grafana
+      GRAFANA_SERVICE_PORT: "3000"
+      JAEGER_SERVICE_HOST: jaeger
+      JAEGER_SERVICE_PORT: "16686"
+      LOCUST_WEB_HOST: loadgenerator
+      LOCUST_WEB_PORT: "8089"
+      PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://localhost:4318/v1/traces
+    image: ghcr.io/open-telemetry/demo:v1.1.0-frontendproxy
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 8080
+      published: "8080"
+      protocol: tcp
+    - mode: ingress
+      target: 10000
+      published: "10000"
+      protocol: tcp
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:9.1.0
+    logging:
+      driver: json-file
+      options:
+        max-file: "2"
+        max-size: 5m
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 3000
+      protocol: tcp
+    volumes:
+    - type: bind
+      source: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo/src/grafana/grafana.ini
+      target: /etc/grafana/grafana.ini
+      bind:
+        create_host_path: true
+    - type: bind
+      source: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo/src/grafana/provisioning
+      target: /etc/grafana/provisioning
+      bind:
+        create_host_path: true
+  jaeger:
+    command:
+    - --memory.max-traces
+    - "10000"
+    - --query.base-path
+    - /jaeger/ui
+    container_name: jaeger
+    deploy:
+      resources:
+        limits:
+          memory: "288358400"
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    image: jaegertracing/all-in-one
+    logging:
+      driver: json-file
+      options:
+        max-file: "2"
+        max-size: 5m
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 16686
+      protocol: tcp
+    - mode: ingress
+      target: 4317
+      protocol: tcp
+    restart: always
+  loadgenerator:
+    build:
+      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo
+      dockerfile: ./src/loadgenerator/Dockerfile
+      cache_from:
+      - ghcr.io/open-telemetry/demo:v1.1.0-loadgenerator
+    container_name: load-generator
+    depends_on:
+      frontend:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: "125829120"
+    environment:
+      LOCUST_AUTOSTART: "true"
+      LOCUST_HEADLESS: "false"
+      LOCUST_HOST: http://frontend:8080
+      LOCUST_USERS: "10"
+      LOCUST_WEB_PORT: "8089"
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otelcol:4317
+      OTEL_SERVICE_NAME: loadgenerator
+      PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
+    image: ghcr.io/open-telemetry/demo:v1.1.0-loadgenerator
+    logging:
+      driver: json-file
+      options:
+        max-file: "2"
+        max-size: 5m
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 8089
+      protocol: tcp
+    restart: always
+  otelcol:
+    command:
+    - --config=/etc/otelcol-config.yml
+    - --config=/etc/otelcol-config-extras.yml
+    container_name: otel-col
+    depends_on:
+      jaeger:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: "104857600"
+    image: otel/opentelemetry-collector-contrib:0.61.0
+    logging:
+      driver: json-file
+      options:
+        max-file: "2"
+        max-size: 5m
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 4317
+      protocol: tcp
+    - mode: ingress
+      target: 4318
+      published: "4318"
+      protocol: tcp
+    - mode: ingress
+      target: 9464
+      protocol: tcp
+    - mode: ingress
+      target: 8888
+      protocol: tcp
+    restart: always
+    volumes:
+    - type: bind
+      source: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo/src/otelcollector/otelcol-config.yml
+      target: /etc/otelcol-config.yml
+      bind:
+        create_host_path: true
+    - type: bind
+      source: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo/src/otelcollector/otelcol-config-extras.yml
+      target: /etc/otelcol-config-extras.yml
+      bind:
+        create_host_path: true
+  paymentservice:
+    build:
+      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo
+      dockerfile: ./src/paymentservice/Dockerfile
+      cache_from:
+      - ghcr.io/open-telemetry/demo:v1.1.0-paymentservice
+    container_name: payment-service
+    depends_on:
+      otelcol:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: "73400320"
+    environment:
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://otelcol:4317
+      OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE: cumulative
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otelcol:4317
+      OTEL_SERVICE_NAME: paymentservice
+      PAYMENT_SERVICE_PORT: "50051"
+    image: ghcr.io/open-telemetry/demo:v1.1.0-paymentservice
+    logging:
+      driver: json-file
+      options:
+        max-file: "2"
+        max-size: 5m
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 50051
+      protocol: tcp
+    restart: always
+  productcatalogservice:
+    build:
+      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo
+      dockerfile: ./src/productcatalogservice/Dockerfile
+      cache_from:
+      - ghcr.io/open-telemetry/demo:v1.1.0-productcatalogservice
+    container_name: product-catalog-service
+    depends_on:
+      otelcol:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: "20971520"
+    environment:
+      FEATURE_FLAG_GRPC_SERVICE_ADDR: featureflagservice:50053
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otelcol:4317
+      OTEL_SERVICE_NAME: productcatalogservice
+      PRODUCT_CATALOG_SERVICE_PORT: "3550"
+    image: ghcr.io/open-telemetry/demo:v1.1.0-productcatalogservice
+    logging:
+      driver: json-file
+      options:
+        max-file: "2"
+        max-size: 5m
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 3550
+      protocol: tcp
+    restart: always
+  prometheus:
+    command:
+    - --web.console.templates=/etc/prometheus/consoles
+    - --web.console.libraries=/etc/prometheus/console_libraries
+    - --storage.tsdb.retention.time=1h
+    - --config.file=/etc/prometheus/prometheus-config.yaml
+    - --storage.tsdb.path=/prometheus
+    - --web.enable-lifecycle
+    - --web.route-prefix=/
+    container_name: prometheus
+    image: quay.io/prometheus/prometheus:v2.34.0
+    logging:
+      driver: json-file
+      options:
+        max-file: "2"
+        max-size: 5m
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 9090
+      published: "9090"
+      protocol: tcp
+    volumes:
+    - type: bind
+      source: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo/src/prometheus/prometheus-config.yaml
+      target: /etc/prometheus/prometheus-config.yaml
+      bind:
+        create_host_path: true
+  quoteservice:
+    build:
+      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo
+      dockerfile: ./src/quoteservice/Dockerfile
+      cache_from:
+      - ghcr.io/open-telemetry/demo:v1.1.0-quoteservice
+    container_name: quoteservice
+    depends_on:
+      otelcol:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: "31457280"
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otelcol:4318
+      OTEL_EXPORTER_OTLP_TRACES_PROTOCOL: http/protobuf
+      OTEL_PHP_TRACES_PROCESSOR: simple
+      OTEL_SERVICE_NAME: quoteservice
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_TRACES_SAMPLER: parentbased_always_on
+      QUOTE_SERVICE_PORT: "8090"
+    image: ghcr.io/open-telemetry/demo:v1.1.0-quoteservice
+    logging:
+      driver: json-file
+      options:
+        max-file: "2"
+        max-size: 5m
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 8090
+      protocol: tcp
+    restart: always
+  recommendationservice:
+    build:
+      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo
+      dockerfile: ./src/recommendationservice/Dockerfile
+      cache_from:
+      - ghcr.io/open-telemetry/demo:v1.1.0-recommendationservice
+    container_name: recommendation-service
+    depends_on:
+      featureflagservice:
+        condition: service_started
+      otelcol:
+        condition: service_started
+      productcatalogservice:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: "524288000"
+    environment:
+      FEATURE_FLAG_GRPC_SERVICE_ADDR: featureflagservice:50053
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otelcol:4317
+      OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE: cumulative
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_PYTHON_LOG_CORRELATION: "true"
+      OTEL_SERVICE_NAME: recommendationservice
+      OTEL_TRACES_EXPORTER: otlp
+      PRODUCT_CATALOG_SERVICE_ADDR: productcatalogservice:3550
+      PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
+      RECOMMENDATION_SERVICE_PORT: "9001"
+    image: ghcr.io/open-telemetry/demo:v1.1.0-recommendationservice
+    logging:
+      driver: json-file
+      options:
+        max-file: "2"
+        max-size: 5m
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 9001
+      protocol: tcp
+    restart: always
+  redis-cart:
+    container_name: redis-cart
+    deploy:
+      resources:
+        limits:
+          memory: "20971520"
+    image: redis:alpine
+    logging:
+      driver: json-file
+      options:
+        max-file: "2"
+        max-size: 5m
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 6379
+      protocol: tcp
+    restart: always
+  shippingservice:
+    build:
+      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo
+      dockerfile: ./src/shippingservice/Dockerfile
+      cache_from:
+      - ghcr.io/open-telemetry/demo:v1.1.0-shippingservice
+    container_name: shipping-service
+    depends_on:
+      otelcol:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: "20971520"
+    environment:
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otelcol:4317
+      OTEL_SERVICE_NAME: shippingservice
+      QUOTE_SERVICE_ADDR: http://quoteservice:8090
+      SHIPPING_SERVICE_PORT: "50050"
+    image: ghcr.io/open-telemetry/demo:v1.1.0-shippingservice
+    logging:
+      driver: json-file
+      options:
+        max-file: "2"
+        max-size: 5m
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 50050
+      protocol: tcp
+    restart: always
+networks:
+  default:
+    name: opentelemetry-demo
+    driver: bridge
+x-default-logging:
+  driver: json-file
+  options:
+    max-file: "2"
+    max-size: 5m
