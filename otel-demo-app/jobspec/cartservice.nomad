@@ -24,11 +24,11 @@ job "cartservice" {
 
       port = "containerport"
 
-      check {
-        type     = "tcp"
-        interval = "10s"
-        timeout  = "5s"
-      }
+      // check {
+      //   type     = "tcp"
+      //   interval = "10s"
+      //   timeout  = "5s"
+      // }
     }
 
  
@@ -43,15 +43,29 @@ job "cartservice" {
       env {
         ASPNETCORE_URLS = "http://*:7070"
         CART_SERVICE_PORT = "7070"
-        OTEL_EXPORTER_OTLP_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
+        // OTEL_EXPORTER_OTLP_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
         OTEL_SERVICE_NAME = "cartservice"
-        REDIS_ADDR = "redis-cart.localhost:6379"
       }      
 
-      resources {
-        cpu    = 500
-        memory = 256
+      template {
+        data = <<EOF
+{{ range service "redis-service" }}
+REDIS_ADDR = "{{ .Address }}:{{ .Port }}"
+{{ end }}
+
+{{ range service "otelcol-grpc" }}
+OTEL_EXPORTER_OTLP_ENDPOINT = "http://{{ .Address }}:{{ .Port }}"
+{{ end }}
+
+EOF
+        destination = "local/env"
+        env         = true
       }
+
+      // resources {
+      //   cpu    = 500
+      //   memory = 256
+      // }
 
     }
   }

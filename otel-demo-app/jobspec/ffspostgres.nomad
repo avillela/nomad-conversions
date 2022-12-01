@@ -39,12 +39,13 @@ job "ffspostgres" {
       // }
 
       service {
-        provider = "nomad"
-        tags = [
-          "traefik.tcp.routers.ffspostgres.rule=HostSNI(`*`)",
-          "traefik.tcp.routers.ffspostgres.entrypoints=grpc",
-          "traefik.enable=true",
-        ]
+        name = "ffpostgres-service"
+        // provider = "nomad"
+        // tags = [
+        //   "traefik.tcp.routers.ffspostgres.rule=HostSNI(`*`)",
+        //   "traefik.tcp.routers.ffspostgres.entrypoints=grpc",
+        //   "traefik.enable=true",
+        // ]
         port = "db"
       }
 

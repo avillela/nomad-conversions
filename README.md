@@ -32,7 +32,7 @@ Work in progress.
     127.0.0.1   prometheus.localhost
     127.0.0.1   quoteservice.localhost
     127.0.0.1   recommendationservice.localhost
-    127.0.0.1   redis.localhost
+    127.0.0.1   redis-cart.localhost
     127.0.0.1   shippingservice.localhost
     ```
 
@@ -69,7 +69,7 @@ Work in progress.
     Test Redis connection:
     
     ```bash
-    redis-cli -h redis.localhost -p 6379 PING
+    redis-cli -h redis-cart.localhost -p 6379 PING
     ```
 
     >**NOTE:** Install the Redis CLI [here](https://redis.io/docs/getting-started/installation/).
@@ -108,3 +108,28 @@ Work in progress.
 
     {"partialSuccess":{}}⏎  
     ```
+
+## Notes
+
+In order for services to communicate between each other, you need to use Consul templating. For example:
+
+```hcl
+      template {
+        data = <<EOF
+{{ range service "redis-service" }}
+REDIS_ADDR = "{{ .Address }}:{{ .Port }}"
+{{ end }}
+
+{{ range service "otelcol-grpc" }}
+OTEL_EXPORTER_OTLP_ENDPOINT = "http://{{ .Address }}:{{ .Port }}"
+{{ end }}
+
+EOF
+        destination = "local/env"
+        env         = true
+      }
+```
+
+This pulls the IP and port of a service based on its Consul name, and sets it ato an environment variable.
+
+See reference [here](https://discuss.hashicorp.com/t/i-dont-understand-networking-between-services/24470/3).

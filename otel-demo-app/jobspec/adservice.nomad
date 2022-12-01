@@ -24,11 +24,11 @@ job "adservice" {
 
       port = "containerport"
 
-      check {
-        type     = "tcp"
-        interval = "10s"
-        timeout  = "5s"
-      }
+      // check {
+      //   type     = "tcp"
+      //   interval = "10s"
+      //   timeout  = "5s"
+      // }
     }
 
  
@@ -42,16 +42,24 @@ job "adservice" {
       }
       env {
           AD_SERVICE_PORT = "9555"
-          OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
           OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = "cumulative"
-          OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
           OTEL_SERVICE_NAME = "adservice"
       }      
 
-      resources {
-        cpu    = 500
-        memory = 256
+      template {
+        data = <<EOF
+{{ range service "otelcol-grpc" }}
+OTEL_EXPORTER_OTLP_ENDPOINT = "http://{{ .Address }}:{{ .Port }}"
+{{ end }}
+EOF
+        destination = "local/env"
+        env         = true
       }
+
+      // resources {
+      //   cpu    = 500
+      //   memory = 256
+      // }
 
     }
   }

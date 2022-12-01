@@ -109,6 +109,10 @@ exporters:
 
 service:
   pipelines:
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging, otlp/ls]
     traces:
       receivers: [otlp]
       exporters: [logging, otlp/ls]
@@ -124,43 +128,44 @@ EOH
       //   memory = 512
       // }
       service {
-        provider = "nomad"
-        name = "opentelemetry-collector"
+        // provider = "nomad"
+        // name = "otelcol-metrics"
         port = "metrics"
         tags = ["metrics"]
       }
       service {
-        provider = "nomad"
-        name = "opentelemetry-collector"
+        // provider = "nomad"
+        // name = "opentelemetry-collector"
         port = "prometheus"
         tags = ["prometheus"]
       }      
       service {
-        provider = "nomad"
-        name = "opentelemetry-collector"
+        // provider = "nomad"
+        // name = "opentelemetry-collector"
         port = "zipkin"
         tags = ["zipkin"]
       }
       service {
-        provider = "nomad"
-        name = "opentelemetry-collector"
+        // provider = "nomad"
+        // name = "opentelemetry-collector"
         port = "jaeger-compact"
         tags = ["jaeger-compact"]
       }
       service {
-        provider = "nomad"
-        name = "opentelemetry-collector"
+        // provider = "nomad"
+        // name = "opentelemetry-collector"
         port = "jaeger-grpc"
         tags = ["jaeger-grpc"]
       }
       service {
-        provider = "nomad"
-        name = "opentelemetry-collector"
+        // provider = "nomad"
+        // name = "opentelemetry-collector"
         port = "jaeger-thrift"
         tags = ["jaeger-thrift"]
       }
       service {
-        provider = "nomad"
+        // provider = "nomad"
+        name = "otelcol-grpc"
         tags = [
           "traefik.tcp.routers.otel-collector-grpc.rule=HostSNI(`*`)",
           "traefik.tcp.routers.otel-collector-grpc.entrypoints=grpc",
@@ -170,7 +175,8 @@ EOH
       }
 
       service {
-        provider = "nomad"
+        name = "otelcol-http"
+        // provider = "nomad"
         tags = [
           "traefik.http.routers.otel-collector-http.rule=Host(`otel-collector-http.localhost`)",
           "traefik.http.routers.otel-collector-http.entrypoints=web",

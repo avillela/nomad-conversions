@@ -14,14 +14,7 @@ job "redis" {
     }
 
     service {
-      provider = "nomad"
-      tags = [
-        "traefik.http.routers.redis.rule=Host(`redis.localhost`)",
-        "traefik.http.routers.redis.entrypoints=web",
-        "traefik.http.routers.redis.tls=false",
-        "traefik.enable=true",
-      ]
-
+      name = "redis-service"
       port = "db"
 
       check {
