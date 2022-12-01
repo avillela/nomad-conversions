@@ -45,13 +45,6 @@ job "ffspostgres" {
           "traefik.tcp.routers.ffspostgres.entrypoints=grpc",
           "traefik.enable=true",
         ]
-
-        // tags = [
-        //   "traefik.http.routers.ffspostgres.rule=Host(`ffspostgres.localhost`)",
-        //   "traefik.http.routers.ffspostgres.entrypoints=web",
-        //   "traefik.http.routers.ffspostgres.tls=false",
-        //   "traefik.enable=true",
-        // ]
         port = "db"
       }
 
