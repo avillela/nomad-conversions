@@ -50,7 +50,7 @@ EOF
       // }
 
       service {
-        name = "ffpostgres-service"
+        name = "ffspostgres-service"
         // provider = "nomad"
         // tags = [
         //   "traefik.tcp.routers.ffspostgres.rule=HostSNI(`*`)",

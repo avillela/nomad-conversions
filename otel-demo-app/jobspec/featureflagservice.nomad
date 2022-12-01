@@ -17,13 +17,14 @@ job "featureflagservice" {
     }
 
     service {
-      provider = "nomad"
-      tags = [
-        "traefik.http.routers.featureflagservice.rule=Host(`featureflagservice.localhost`)",
-        "traefik.http.routers.featureflagservice.entrypoints=web",
-        "traefik.http.routers.featureflagservice.tls=false",
-        "traefik.enable=true",
-      ]
+      name = "featureflagservice-http"
+      // provider = "nomad"
+      // tags = [
+      //   "traefik.http.routers.featureflagservice.rule=Host(`featureflagservice.localhost`)",
+      //   "traefik.http.routers.featureflagservice.entrypoints=web",
+      //   "traefik.http.routers.featureflagservice.tls=false",
+      //   "traefik.enable=true",
+      // ]
 
       port = "http"
 
@@ -35,12 +36,13 @@ job "featureflagservice" {
     }
 
     service {
-      provider = "nomad"
-      tags = [
-        "traefik.tcp.routers.featureflagservice-grpc.rule=HostSNI(`*`)",
-        "traefik.tcp.routers.featureflagservice-grpc.entrypoints=grpc",
-        "traefik.enable=true",
-      ]        
+      name = "featureflagservice-grpc"
+      // provider = "nomad"
+      // tags = [
+      //   "traefik.tcp.routers.featureflagservice-grpc.rule=HostSNI(`*`)",
+      //   "traefik.tcp.routers.featureflagservice-grpc.entrypoints=grpc",
+      //   "traefik.enable=true",
+      // ]        
       port = "grpc"
     }
 
@@ -53,19 +55,33 @@ job "featureflagservice" {
         ports = ["http", "grpc"]
       }
       env {
-        DATABASE_URL = "ecto://ffs:ffs@ffspostgres.localhost:7233/ffs"
+        // DATABASE_URL = "ecto://ffs:ffs@ffspostgres.localhost:7233/ffs"
         FEATURE_FLAG_GRPC_SERVICE_PORT = "50053"
         FEATURE_FLAG_SERVICE_PATH_ROOT = "\"/feature\""
         FEATURE_FLAG_SERVICE_PORT = "8081"
-        OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
+        // OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
         OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = "grpc"
         OTEL_SERVICE_NAME = "featureflagservice"
-      }      
-
-      resources {
-        cpu    = 500
-        memory = 256
       }
+
+      template {
+        data = <<EOF
+{{ range service "ffspostgres-service" }}
+DATABASE_URL = "ecto://ffs:ffs@{{ .Address }}:{{ .Port }}/ffs"
+{{ end }}
+
+{{ range service "otelcol-grpc" }}
+OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://{{ .Address }}:{{ .Port }}"
+{{ end }}
+EOF
+        destination = "local/env"
+        env         = true
+      }
+
+      // resources {
+      //   cpu    = 500
+      //   memory = 256
+      // }
 
     }
   }

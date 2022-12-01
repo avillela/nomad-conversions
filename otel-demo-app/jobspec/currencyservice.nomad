@@ -52,7 +52,6 @@ job "currencyservice" {
 {{ range service "otelcol-grpc" }}
 OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://{{ .Address }}:{{ .Port }}"
 {{ end }}
-
 EOF
         destination = "local/env"
         env         = true

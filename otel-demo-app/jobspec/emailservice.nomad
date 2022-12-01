@@ -14,13 +14,14 @@ job "emailservice" {
     }
 
     service {
-      provider = "nomad"
-      tags = [
-        "traefik.http.routers.emailservice.rule=Host(`emailservice.localhost`)",
-        "traefik.http.routers.emailservice.entrypoints=web",
-        "traefik.http.routers.emailservice.tls=false",
-        "traefik.enable=true",
-      ]
+      name = "emailservice"
+      // provider = "nomad"
+      // tags = [
+      //   "traefik.http.routers.emailservice.rule=Host(`emailservice.localhost`)",
+      //   "traefik.http.routers.emailservice.entrypoints=web",
+      //   "traefik.http.routers.emailservice.tls=false",
+      //   "traefik.enable=true",
+      // ]
 
       port = "containerport"
 
@@ -43,14 +44,24 @@ job "emailservice" {
       env {
         APP_ENV = "production"
         EMAIL_SERVICE_PORT = "6060"
-        OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
+        // OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
         OTEL_SERVICE_NAME = "emailservice"
-      }      
-
-      resources {
-        cpu    = 500
-        memory = 256
       }
+
+      template {
+        data = <<EOF
+{{ range service "otelcol-grpc" }}
+OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://{{ .Address }}:{{ .Port }}"
+{{ end }}
+EOF
+        destination = "local/env"
+        env         = true
+      }
+
+      // resources {
+      //   cpu    = 500
+      //   memory = 256
+      // }
 
     }
   }

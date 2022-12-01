@@ -56,7 +56,6 @@ REDIS_ADDR = "{{ .Address }}:{{ .Port }}"
 {{ range service "otelcol-grpc" }}
 OTEL_EXPORTER_OTLP_ENDPOINT = "http://{{ .Address }}:{{ .Port }}"
 {{ end }}
-
 EOF
         destination = "local/env"
         env         = true
