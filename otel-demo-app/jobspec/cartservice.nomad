@@ -45,7 +45,7 @@ job "cartservice" {
         CART_SERVICE_PORT = "7070"
         OTEL_EXPORTER_OTLP_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
         OTEL_SERVICE_NAME = "cartservice"
-        REDIS_ADDR = "redis-cart.localhost"
+        REDIS_ADDR = "redis-cart.localhost:6379"
       }      
 
       resources {
