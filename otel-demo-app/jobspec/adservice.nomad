@@ -14,21 +14,22 @@ job "adservice" {
     }
 
     service {
-      provider = "nomad"
-      tags = [
-        "traefik.http.routers.adservice.rule=Host(`adservice.localhost`)",
-        "traefik.http.routers.adservice.entrypoints=web",
-        "traefik.http.routers.adservice.tls=false",
-        "traefik.enable=true",
-      ]
+      name = "adservice"
+      // provider = "nomad"
+      // tags = [
+      //   "traefik.http.routers.adservice.rule=Host(`adservice.localhost`)",
+      //   "traefik.http.routers.adservice.entrypoints=web",
+      //   "traefik.http.routers.adservice.tls=false",
+      //   "traefik.enable=true",
+      // ]
 
       port = "containerport"
 
-      // check {
-      //   type     = "tcp"
-      //   interval = "10s"
-      //   timeout  = "5s"
-      // }
+      check {
+        type     = "tcp"
+        interval = "10s"
+        timeout  = "5s"
+      }
     }
 
  

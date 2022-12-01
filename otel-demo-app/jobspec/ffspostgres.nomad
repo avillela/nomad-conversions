@@ -29,8 +29,19 @@ job "ffspostgres" {
         POSTGRES_DB = "ffs"
         POSTGRES_PASSWORD = "ffs"
         POSTGRES_USER = "ffs"
-        OTEL_EXPORTER_OTLP_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
+        // OTEL_EXPORTER_OTLP_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
         OTEL_SERVICE_NAME = "ffspostgres"
+      }
+
+      template {
+        data = <<EOF
+{{ range service "otelcol-grpc" }}
+OTEL_EXPORTER_OTLP_ENDPOINT = "http://{{ .Address }}:{{ .Port }}"
+{{ end }}
+
+EOF
+        destination = "local/env"
+        env         = true
       }
 
       // resources {

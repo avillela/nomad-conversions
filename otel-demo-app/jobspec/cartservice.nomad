@@ -14,21 +14,22 @@ job "cartservice" {
     }
 
     service {
-      provider = "nomad"
-      tags = [
-        "traefik.http.routers.cartservice.rule=Host(`cartservice.localhost`)",
-        "traefik.http.routers.cartservice.entrypoints=web",
-        "traefik.http.routers.cartservice.tls=false",
-        "traefik.enable=true",
-      ]
+      name = "cartservice"
+      // provider = "nomad"
+      // tags = [
+      //   "traefik.http.routers.cartservice.rule=Host(`cartservice.localhost`)",
+      //   "traefik.http.routers.cartservice.entrypoints=web",
+      //   "traefik.http.routers.cartservice.tls=false",
+      //   "traefik.enable=true",
+      // ]
 
       port = "containerport"
 
-      // check {
-      //   type     = "tcp"
-      //   interval = "10s"
-      //   timeout  = "5s"
-      // }
+      check {
+        type     = "tcp"
+        interval = "10s"
+        timeout  = "5s"
+      }
     }
 
  
@@ -43,7 +44,6 @@ job "cartservice" {
       env {
         ASPNETCORE_URLS = "http://*:7070"
         CART_SERVICE_PORT = "7070"
-        // OTEL_EXPORTER_OTLP_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
         OTEL_SERVICE_NAME = "cartservice"
       }      
 

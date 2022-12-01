@@ -14,13 +14,14 @@ job "currencyservice" {
     }
 
     service {
-      provider = "nomad"
-      tags = [
-        "traefik.http.routers.currencyservice.rule=Host(`currencyservice.localhost`)",
-        "traefik.http.routers.currencyservice.entrypoints=web",
-        "traefik.http.routers.currencyservice.tls=false",
-        "traefik.enable=true",
-      ]
+      name = "currencyservice"
+      // provider = "nomad"
+      // tags = [
+      //   "traefik.http.routers.currencyservice.rule=Host(`currencyservice.localhost`)",
+      //   "traefik.http.routers.currencyservice.entrypoints=web",
+      //   "traefik.http.routers.currencyservice.tls=false",
+      //   "traefik.enable=true",
+      // ]
 
       port = "containerport"
 
@@ -42,14 +43,25 @@ job "currencyservice" {
       }
       env {
         CURRENCY_SERVICE_PORT = "7001"
-        OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
+        // OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
         OTEL_RESOURCE_ATTRIBUTES = "service.name=currencyservice"
-      }      
-
-      resources {
-        cpu    = 500
-        memory = 256
       }
+
+      template {
+        data = <<EOF
+{{ range service "otelcol-grpc" }}
+OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://{{ .Address }}:{{ .Port }}"
+{{ end }}
+
+EOF
+        destination = "local/env"
+        env         = true
+      }
+
+      // resources {
+      //   cpu    = 500
+      //   memory = 256
+      // }
 
     }
   }
