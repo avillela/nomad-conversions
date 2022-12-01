@@ -14,7 +14,7 @@ job "ffspostgres" {
     network {
       
       port "db" {
-        static = 5432
+        to = 5432
       }
     }
 
@@ -33,23 +33,27 @@ job "ffspostgres" {
         OTEL_SERVICE_NAME = "ffspostgres"
       }
 
-      resources {
-        cpu    = 200
-        memory = 512
+      // resources {
+      //   cpu    = 200
+      //   memory = 512
+      // }
+
+      service {
+        provider = "nomad"
+        tags = [
+          "traefik.tcp.routers.ffspostgres.rule=HostSNI(`*`)",
+          "traefik.tcp.routers.ffspostgres.entrypoints=grpc",
+          "traefik.enable=true",
+        ]
+
+        // tags = [
+        //   "traefik.http.routers.ffspostgres.rule=Host(`ffspostgres.localhost`)",
+        //   "traefik.http.routers.ffspostgres.entrypoints=web",
+        //   "traefik.http.routers.ffspostgres.tls=false",
+        //   "traefik.enable=true",
+        // ]
+        port = "db"
       }
-
-    service {
-      provider = "nomad"
-      tags = [
-        "traefik.http.routers.ffspostgres.rule=Host(`ffspostgres.localhost`)",
-        "traefik.http.routers.ffspostgres.entrypoints=web",
-        "traefik.http.routers.ffspostgres.tls=false",
-        "traefik.enable=true",
-      ]
-
-      port = "db"
-
-    }
 
     }
   }

@@ -53,7 +53,7 @@ job "featureflagservice" {
         ports = ["http", "grpc"]
       }
       env {
-        DATABASE_URL = "ecto://ffs:ffs@ffspostgres.localhost:5432/ffs"
+        DATABASE_URL = "ecto://ffs:ffs@ffspostgres.localhost:7233/ffs"
         FEATURE_FLAG_GRPC_SERVICE_PORT = "50053"
         FEATURE_FLAG_SERVICE_PATH_ROOT = "\"/feature\""
         FEATURE_FLAG_SERVICE_PORT = "8081"
