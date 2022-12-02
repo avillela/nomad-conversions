@@ -44,24 +44,24 @@ job "emailservice" {
       env {
         APP_ENV = "production"
         EMAIL_SERVICE_PORT = "6060"
-        // OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
+        // OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-http.localhost/v1/traces"
         OTEL_SERVICE_NAME = "emailservice"
       }
 
       template {
         data = <<EOF
-{{ range service "otelcol-grpc" }}
-OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://{{ .Address }}:{{ .Port }}"
+{{ range service "otelcol-http" }}
+OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://{{ .Address }}:{{ .Port }}/v1/traces"
 {{ end }}
 EOF
         destination = "local/env"
         env         = true
       }
 
-      // resources {
-      //   cpu    = 500
-      //   memory = 256
-      // }
+      resources {
+        cpu    = 75
+        memory = 150
+      }
 
     }
   }

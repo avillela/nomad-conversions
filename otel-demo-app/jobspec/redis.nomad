@@ -34,10 +34,10 @@ job "redis" {
         ports = ["db"]
       }
 
-      // resources {
-      //   cpu    = 500
-      //   memory = 256
-      // }
+      resources {
+        cpu    = 75
+        memory = 150
+      }
 
     }
   }

@@ -57,10 +57,10 @@ EOF
         env         = true
       }
 
-      // resources {
-      //   cpu    = 500
-      //   memory = 256
-      // }
+      resources {
+        cpu    = 75
+        memory = 100
+      }
 
     }
   }

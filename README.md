@@ -133,3 +133,18 @@ EOF
 This pulls the IP and port of a service based on its Consul name, and sets it ato an environment variable.
 
 See reference [here](https://discuss.hashicorp.com/t/i-dont-understand-networking-between-services/24470/3).
+
+## Service Startup Order
+
+redis
+ffspostgres
+otel-collector
+adservice - a little finnicky to start up, so might need to restart
+cartservice
+currencyservice
+emailservice
+featureflagservice
+paymentservice
+productcatalogservice
+quoteservice
+shippingservice

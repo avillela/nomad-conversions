@@ -44,10 +44,10 @@ EOF
         env         = true
       }
 
-      // resources {
-      //   cpu    = 200
-      //   memory = 512
-      // }
+      resources {
+        cpu    = 75
+        memory = 300
+      }
 
       service {
         name = "ffspostgres-service"

@@ -51,10 +51,6 @@ job "paymentservice" {
 
       template {
         data = <<EOF
-{{ range service "ffspostgres-service" }}
-DATABASE_URL = "ecto://ffs:ffs@{{ .Address }}:{{ .Port }}/ffs"
-{{ end }}
-
 {{ range service "otelcol-grpc" }}
 OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = "http://{{ .Address }}:{{ .Port }}"
 OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://{{ .Address }}:{{ .Port }}"
@@ -64,10 +60,10 @@ EOF
         env         = true
       }
 
-      // resources {
-      //   cpu    = 500
-      //   memory = 256
-      // }
+      resources {
+        cpu    = 75
+        memory = 150
+      }
 
     }
   }

@@ -123,10 +123,11 @@ EOH
         destination = "local/config/otel-collector-config.yaml"
       }
 
-      // resources {
-      //   cpu    = 256
-      //   memory = 512
-      // }
+      resources {
+        cpu    = 75
+        memory = 150
+      }
+
       service {
         // provider = "nomad"
         // name = "otelcol-metrics"

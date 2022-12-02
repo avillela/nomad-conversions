@@ -77,6 +77,12 @@ job "traefik" {
           "--providers.nomad.endpoint.address=http://10.9.99.10:4646" ### IP to your nomad server 
         ]
       }
+
+      resources {
+        cpu    = 75
+        memory = 100
+      }
+
     }
   }
 }

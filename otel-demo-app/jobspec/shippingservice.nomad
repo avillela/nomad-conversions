@@ -14,13 +14,14 @@ job "shippingservice" {
     }
 
     service {
-      provider = "nomad"
-      tags = [
-        "traefik.http.routers.shippingservice.rule=Host(`shippingservice.localhost`)",
-        "traefik.http.routers.shippingservice.entrypoints=web",
-        "traefik.http.routers.shippingservice.tls=false",
-        "traefik.enable=true",
-      ]
+      name = "shippingservice"
+      // provider = "nomad"
+      // tags = [
+      //   "traefik.http.routers.shippingservice.rule=Host(`shippingservice.localhost`)",
+      //   "traefik.http.routers.shippingservice.entrypoints=web",
+      //   "traefik.http.routers.shippingservice.tls=false",
+      //   "traefik.enable=true",
+      // ]
 
       port = "containerport"
 
@@ -41,15 +42,29 @@ job "shippingservice" {
         ports = ["containerport"]
       }
       env {
-        OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
+        // OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
         OTEL_SERVICE_NAME = "shippingservice"
-        QUOTE_SERVICE_ADDR = "http://quoteservice.localhost"
+        // QUOTE_SERVICE_ADDR = "http://quoteservice.localhost"
         SHIPPING_SERVICE_PORT = "50050"
-      }      
+      }
+
+      template {
+        data = <<EOF
+{{ range service "quoteservice" }}
+QUOTE_SERVICE_ADDR = "http://{{ .Address }}:{{ .Port }}"
+{{ end }}
+
+{{ range service "otelcol-grpc" }}
+OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://{{ .Address }}:{{ .Port }}"
+{{ end }}
+EOF
+        destination = "local/env"
+        env         = true
+      }
 
       resources {
-        cpu    = 500
-        memory = 256
+        cpu    = 75
+        memory = 100
       }
 
     }

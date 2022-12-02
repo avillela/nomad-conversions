@@ -14,13 +14,14 @@ job "productcatalogservice" {
     }
 
     service {
-      provider = "nomad"
-      tags = [
-        "traefik.http.routers.productcatalogservice.rule=Host(`productcatalogservice.localhost`)",
-        "traefik.http.routers.productcatalogservice.entrypoints=web",
-        "traefik.http.routers.productcatalogservice.tls=false",
-        "traefik.enable=true",
-      ]
+      name = "productcatalogservice"
+      // provider = "nomad"
+      // tags = [
+      //   "traefik.http.routers.productcatalogservice.rule=Host(`productcatalogservice.localhost`)",
+      //   "traefik.http.routers.productcatalogservice.entrypoints=web",
+      //   "traefik.http.routers.productcatalogservice.tls=false",
+      //   "traefik.enable=true",
+      // ]
 
       port = "containerport"
 
@@ -41,17 +42,30 @@ job "productcatalogservice" {
         ports = ["containerport"]
       }
       env {
-        FEATURE_FLAG_GRPC_SERVICE_ADDR = "featureflagservice.localhost:7233"
-        OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
+        // FEATURE_FLAG_GRPC_SERVICE_ADDR = "featureflagservice.localhost:7233"
+        // OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
         OTEL_SERVICE_NAME = "productcatalogservice"
         PRODUCT_CATALOG_SERVICE_PORT = "3550"
-      }      
-
-      resources {
-        cpu    = 500
-        memory = 256
       }
 
+      template {
+        data = <<EOF
+{{ range service "featureflagservice-grpc" }}
+FEATURE_FLAG_GRPC_SERVICE_ADDR = "{{ .Address }}:{{ .Port }}"
+{{ end }}
+
+{{ range service "otelcol-grpc" }}
+OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://{{ .Address }}:{{ .Port }}"
+{{ end }}
+EOF
+        destination = "local/env"
+        env         = true
+      }
+
+      resources {
+        cpu    = 75
+        memory = 150
+      }
     }
   }
 }
