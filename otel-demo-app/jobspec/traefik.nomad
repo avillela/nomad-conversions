@@ -1,18 +1,16 @@
-# https://traefik.io/blog/traefik-proxy-fully-integrates-with-hashicorp-nomad/
-
 job "traefik" {
+  region      = "global"
   datacenters = ["dc1"]
   type        = "service"
 
-  group "traefik" {
+  group "svc" {
     count = 1
 
     network {
-      port  "http"{
-         static = 80
-      }
-      port  "admin"{
-         static = 8181
+      mode = "host"
+
+      port "http" {
+        static = 80
       }
 
       port "api" {
@@ -30,8 +28,18 @@ job "traefik" {
     }
 
     service {
+      name = "traefik-entrypoint-grpc"
+      port = "grpc"
+
+      check {
+        type     = "tcp"
+        interval = "10s"
+        timeout  = "5s"
+      }
+    }
+
+    service {
       name = "traefik-dashboard"
-      provider = "nomad"
       tags = [
         "traefik.enable=true",
         "traefik.http.routers.dashboard.rule=Host(`traefik.localhost`)",
@@ -48,41 +56,53 @@ job "traefik" {
       }
     }
 
-    service {
-      name = "traefik-grpc"
-      provider = "nomad"
-      port = "grpc"
-
-      check {
-        type     = "tcp"
-        interval = "10s"
-        timeout  = "5s"
-      }
-    }
-
-    task "server" {
+    task "loadbalancer" {
       driver = "docker"
+
       config {
-        image = "traefik:v2.8.0-rc1"
-        ports = ["admin", "http", "api", "metrics", "grpc"]
-        args = [
-          "--api.dashboard=true",
-          "--api.insecure=true", ### For Test only, please do not use that in production
-          "--log.level=DEBUG",
-          "--entrypoints.web.address=:${NOMAD_PORT_http}",
-          "--entrypoints.traefik.address=:${NOMAD_PORT_admin}",
-          "--entrypoints.metrics.address=:${NOMAD_PORT_metrics}",
-          "--entrypoints.grpc.address=:${NOMAD_PORT_grpc}",
-          "--providers.nomad=true",
-          "--providers.nomad.endpoint.address=http://10.9.99.10:4646" ### IP to your nomad server 
+        network_mode = "host"
+        image        = "traefik:v2.8.0-rc1"
+        ports        = ["http", "api", "metrics", "grpc"]
+
+        volumes = [
+          "local/traefik.toml:/etc/traefik/traefik.toml",
         ]
       }
 
-      resources {
-        cpu    = 75
-        memory = 100
+      template {
+        data = <<EOF
+[entryPoints]
+    [entryPoints.web]
+    address = ":80"
+    [entryPoints.metrics]
+    address = ":8082"
+    [entryPoints.grpc]
+    address = ":7233"
+
+
+[api]
+    dashboard = true
+    insecure  = true
+
+[log]
+    level = "DEBUG"
+# Enable Consul Catalog configuration backend.
+[providers.consulCatalog]
+    prefix           = "traefik"
+    exposedByDefault = false
+
+    [providers.consulCatalog.endpoint]
+      address = "http://localhost:8500"
+      scheme  = "http"
+EOF
+
+        destination = "local/traefik.toml"
       }
 
+      resources {
+        cpu    = 50
+        memory = 75
+      }
     }
   }
 }
