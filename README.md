@@ -4,13 +4,23 @@ Repo of Docker Compose and/or Kubernetes manifests converted to Nomad Jobspecs.
 
 If I'm feeling extra-adventurous, I will try creating Nomad Packs for these.
 
-Work in progress.
+This is work in progress.
 
-## Deployment Steps
+## OTel Demo App
+
+### Known Issues
+
+* The `frontend` service is still flaky. It keeps re-starting periodically, especially if the `loadgenerator` is running.
+* I haven't gotten the `frontendproxy` running yet, as I haven't tried deploying the `grafana`, `prometheus`, and `jaeger` services.
+* Right now, I send all traces to [Lightstep](https://app.lightstep.com). Learn more about how to configure the OTel Collector on Nomad to send traces to Lightstep [here](https://medium.com/tucows/just-in-time-nomad-running-the-opentelemetry-collector-on-hashicorp-nomad-with-hashiqube-4eaf009b8382).
+### Deployment Steps
+
+This assumes that you have HashiCorp Nomad, Consul, and Vault running somewhere. For a quick and easy local dev setup of the aforementioned tools, I highly recommend using [HashiQube](https://github.com/avillela/hashiqube).
+
 
 1. Add endpoints to `/etc/hosts`
 
-    This is assuming that you are doing local dev using [HashiQube](https://github.com/avillela/hashiqube).
+    **Only if you're doing local dev **
 
     ```bash
     # For HashiQube
@@ -93,7 +103,7 @@ Work in progress.
     {"partialSuccess":{}}⏎  
     ```
 
-## Nuke deployments
+### Nuke deployments
 
 ```bash
 nomad job stop -purge traefik
@@ -116,6 +126,25 @@ nomad job stop -purge frontendproxy
 nomad job stop -purge loadgenerator
 ```
 
+## Service Startup Order
+
+redis
+ffspostgres
+otel-collector
+adservice - a little finnicky to start up, so might need to restart
+cartservice
+currencyservice
+emailservice
+featureflagservice
+paymentservice
+productcatalogservice
+quoteservice
+shippingservice
+checkoutservice
+recommendationservice
+frontend
+frontendproxy
+loadgenerator
 ## Notes
 
 ### Communication Between Services
@@ -149,22 +178,3 @@ It may take a while to pull the `recommendationservice` (and possibly others) im
 
 You may also wish to set `restart` configs in the `task` stanza as well, as per [the docs](https://developer.hashicorp.com/nomad/docs/job-specification/restart#restart-parameters).
 
-## Service Startup Order
-
-redis
-ffspostgres
-otel-collector
-adservice - a little finnicky to start up, so might need to restart
-cartservice
-currencyservice
-emailservice
-featureflagservice
-paymentservice
-productcatalogservice
-quoteservice
-shippingservice
-checkoutservice
-recommendationservice
-frontend
-frontendproxy
-loadgenerator
