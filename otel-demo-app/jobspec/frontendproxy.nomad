@@ -90,14 +90,8 @@ EOF
       }
 
       resources {
-        cpu    = 60
-        memory = 450
-      }
-
-
-      resources {
         cpu    = 55
-        memory = 500
+        memory = 450
       }
 
     }

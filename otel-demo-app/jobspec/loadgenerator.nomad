@@ -14,13 +14,14 @@ job "loadgenerator" {
     }
 
     service {
-      provider = "nomad"
-      tags = [
-        "traefik.http.routers.loadgenerator.rule=Host(`loadgenerator.localhost`)",
-        "traefik.http.routers.loadgenerator.entrypoints=web",
-        "traefik.http.routers.loadgenerator.tls=false",
-        "traefik.enable=true",
-      ]
+      name = "loadgenerator"
+      // provider = "nomad"
+      // tags = [
+      //   "traefik.http.routers.loadgenerator.rule=Host(`loadgenerator.localhost`)",
+      //   "traefik.http.routers.loadgenerator.entrypoints=web",
+      //   "traefik.http.routers.loadgenerator.tls=false",
+      //   "traefik.enable=true",
+      // ]
 
       port = "containerport"
 
@@ -71,6 +72,7 @@ OTEL_EXPORTER_OTLP_ENDPOINT = "http://{{ .Address }}:{{ .Port }}"
 EOF
         destination = "local/env"
         env         = true
+        change_mode   = "noop"
       }
 
 

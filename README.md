@@ -10,30 +10,19 @@ Work in progress.
 
 1. Add endpoints to `/etc/hosts`
 
+    This is assuming that you are doing local dev using [HashiQube](https://github.com/avillela/hashiqube).
+
     ```bash
     # For HashiQube
     127.0.0.1   traefik.localhost
     127.0.0.1   otel-collector-http.localhost
     127.0.0.1   otel-collector-grpc.localhost
-    127.0.0.1   adservice.localhost
-    127.0.0.1   cartservice.localhost
-    127.0.0.1   checkoutservice.localhost
-    127.0.0.1   currencyservice.localhost
-    127.0.0.1   emailservice.localhost
-    127.0.0.1   featureflagservice.localhost
     127.0.0.1   ffspostgres.localhost
     127.0.0.1   frontend.localhost
     127.0.0.1   frontendproxy.localhost
     127.0.0.1   grafana.localhost
     127.0.0.1   jaeger.localhost
-    127.0.0.1   loadgenerator.localhost
-    127.0.0.1   paymentservice.localhost
-    127.0.0.1   productcatalogservice.localhost
-    127.0.0.1   prometheus.localhost
-    127.0.0.1   quoteservice.localhost
-    127.0.0.1   recommendationservice.localhost
     127.0.0.1   redis-cart.localhost
-    127.0.0.1   shippingservice.localhost
     ```
 
 2. Deploy services
@@ -59,25 +48,9 @@ Work in progress.
     nomad job run -detach otel-demo-app/jobspec/frontendproxy.nomad
     ```
 
-3. Test PostgreSQL
- 
-    ```bash
-    pg_isready -d ffs -h ffspostgres.localhost -p 5432 -U ffs
-    ```
+    The frontend can be accessed here: `http://frontend.localhost`
 
-    You should get this response:
-
-    ```
-    ffspostgres.localhost:5432 - accepting connections
-    ```
-
-    If you want to log into PostgreSQL:
-
-    ```
-    psql -h ffspostgres.localhost -p 5432 -d ffs -U ffs
-    ```
-
-4. Test Redis
+3. Test Redis
    
     ```bash
     redis-cli -h redis-cart.localhost -p 6379 PING
@@ -85,7 +58,7 @@ Work in progress.
 
     >**NOTE:** Install the Redis CLI [here](https://redis.io/docs/getting-started/installation/).
 
-5. Test the OTel Collector
+4. Test the OTel Collector
 
     ```bash
     nomad job run otel-demo-app/jobspec/otel-collector.nomad
@@ -172,9 +145,9 @@ See reference [here](https://discuss.hashicorp.com/t/i-dont-understand-networkin
 
 ### Docker Image Pull Timeout
 
-It may take a while to pull the `recommendationservice` (and possibly others) image. In order to prevent timeout issues, set the `image_pull_timeout` in the `config` section of the `task` stanza, as per [the docs](// https://developer.hashicorp.com/nomad/docs/drivers/docker#image_pull_timeout).
+It may take a while to pull the `recommendationservice` (and possibly others) image. In order to prevent timeout issues, set the `image_pull_timeout` in the `config` section of the `task` stanza, as per [the docs](https://developer.hashicorp.com/nomad/docs/drivers/docker#image_pull_timeout).
 
-You may also wish to set `restart` configs in the `task` stanza as well, as per [the docs](// https://developer.hashicorp.com/nomad/docs/job-specification/restart#restart-parameters).
+You may also wish to set `restart` configs in the `task` stanza as well, as per [the docs](https://developer.hashicorp.com/nomad/docs/job-specification/restart#restart-parameters).
 
 ## Service Startup Order
 

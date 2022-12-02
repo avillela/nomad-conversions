@@ -44,7 +44,9 @@ job "frontend" {
 
       restart {
         attempts = 4
-        delay    = "15s"
+        delay    = "5s"
+        interval = "5s"
+        mode = "delay"
       }
 
       env {
@@ -107,6 +109,7 @@ PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://{{ .Address }}:{{ .Port }}/v
 EOF
         destination = "local/env"
         env         = true
+        change_mode   = "noop"
       }
 
       resources {
