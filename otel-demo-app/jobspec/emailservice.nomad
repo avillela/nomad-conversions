@@ -38,9 +38,15 @@ job "emailservice" {
  
       config {
         image = "otel/demo:v1.1.0-emailservice"
-
+        image_pull_timeout = "10m"
         ports = ["containerport"]
       }
+
+      restart {
+        attempts = 4
+        delay    = "15s"
+      }
+
       env {
         APP_ENV = "production"
         EMAIL_SERVICE_PORT = "6060"

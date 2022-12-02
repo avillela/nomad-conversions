@@ -5,6 +5,11 @@ job "recommendationservice" {
   group "recommendationservice" {
     count = 1
 
+    update {
+      healthy_deadline  = "20m"
+      progress_deadline = "25m"
+    }
+
     network {
       mode = "host"
 
@@ -38,13 +43,13 @@ job "recommendationservice" {
       config {
         image = "otel/demo:v1.1.0-recommendationservice"
         // https://developer.hashicorp.com/nomad/docs/drivers/docker#image_pull_timeout
-        image_pull_timeout = "10m"
+        image_pull_timeout = "15m"
         ports = ["containerport"]
       }
 
       // https://developer.hashicorp.com/nomad/docs/job-specification/restart#restart-parameters
       restart {
-        attempts = 4
+        attempts = 5
         delay    = "15s"
       }
       env {

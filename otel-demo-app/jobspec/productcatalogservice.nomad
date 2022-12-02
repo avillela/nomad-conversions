@@ -38,9 +38,15 @@ job "productcatalogservice" {
  
       config {
         image = "otel/demo:v1.1.0-productcatalogservice"
-
+        image_pull_timeout = "10m"
         ports = ["containerport"]
       }
+
+      restart {
+        attempts = 4
+        delay    = "15s"
+      }
+
       env {
         // FEATURE_FLAG_GRPC_SERVICE_ADDR = "featureflagservice.localhost:7233"
         // OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-grpc.localhost:7233"

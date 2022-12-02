@@ -38,7 +38,7 @@ job "frontend" {
  
       config {
         image = "otel/demo:v1.1.0-frontend"
-
+        image_pull_timeout = "10m"
         ports = ["containerport"]
       }
 

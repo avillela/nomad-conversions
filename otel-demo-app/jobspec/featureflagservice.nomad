@@ -51,9 +51,15 @@ job "featureflagservice" {
  
       config {
         image = "otel/demo:v1.1.0-featureflagservice"
-
+        image_pull_timeout = "10m"
         ports = ["http", "grpc"]
       }
+
+      restart {
+        attempts = 4
+        delay    = "15s"
+      }
+
       env {
         // DATABASE_URL = "ecto://ffs:ffs@ffspostgres.localhost:7233/ffs"
         FEATURE_FLAG_GRPC_SERVICE_PORT = "50053"

@@ -38,9 +38,15 @@ job "checkoutservice" {
  
       config {
         image = "otel/demo:v1.1.0-checkoutservice"
-
+        image_pull_timeout = "10m"
         ports = ["containerport"]
       }
+
+      restart {
+        attempts = 4
+        delay    = "15s"
+      }
+
       env {
         // CART_SERVICE_ADDR = "cartservice.localhost"
         CHECKOUT_SERVICE_PORT = "5050"

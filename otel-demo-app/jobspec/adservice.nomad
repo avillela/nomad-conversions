@@ -5,6 +5,11 @@ job "adservice" {
   group "adservice" {
     count = 1
 
+    update {
+      healthy_deadline  = "20m"
+      progress_deadline = "25m"
+    }
+
     network {
       mode = "host"
 
@@ -38,9 +43,15 @@ job "adservice" {
  
       config {
         image = "otel/demo:v1.1.0-adservice"
-
+        image_pull_timeout = "25m"
         ports = ["containerport"]
       }
+
+      restart {
+        attempts = 10
+        delay    = "15s"
+      }
+
       env {
           AD_SERVICE_PORT = "9555"
           OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = "cumulative"
@@ -58,7 +69,7 @@ EOF
       }
 
       resources {
-        cpu    = 55
+        cpu    = 60
         memory = 450
       }
 

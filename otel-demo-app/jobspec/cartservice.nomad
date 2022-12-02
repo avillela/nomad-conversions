@@ -38,14 +38,20 @@ job "cartservice" {
  
       config {
         image = "otel/demo:v1.1.0-cartservice"
-
+        image_pull_timeout = "10m"
         ports = ["containerport"]
       }
+
+      restart {
+        attempts = 4
+        delay    = "15s"
+      }
+
       env {
         ASPNETCORE_URLS = "http://*:7070"
         CART_SERVICE_PORT = "7070"
         OTEL_SERVICE_NAME = "cartservice"
-      }      
+      }
 
       template {
         data = <<EOF

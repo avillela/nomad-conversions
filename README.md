@@ -36,14 +36,31 @@ Work in progress.
     127.0.0.1   shippingservice.localhost
     ```
 
-2. Deploy Postgres
- 
+2. Deploy services
+
     ```bash
-    nomad job run otel-demo-app/jobspec/ffspostgres.nomad
+    nomad job run -detach otel-demo-app/jobspec/traefik.nomad
+    nomad job run -detach otel-demo-app/jobspec/redis.nomad
+    nomad job run -detach otel-demo-app/jobspec/ffspostgres.nomad
+    nomad job run -detach otel-demo-app/jobspec/otel-collector.nomad
+    nomad job run -detach otel-demo-app/jobspec/adservice.nomad
+    nomad job run -detach otel-demo-app/jobspec/cartservice.nomad
+    nomad job run -detach otel-demo-app/jobspec/currencyservice.nomad
+    nomad job run -detach otel-demo-app/jobspec/emailservice.nomad
+    nomad job run -detach otel-demo-app/jobspec/featureflagservice.nomad
+    nomad job run -detach otel-demo-app/jobspec/paymentservice.nomad
+    nomad job run -detach otel-demo-app/jobspec/productcatalogservice.nomad
+    nomad job run -detach otel-demo-app/jobspec/quoteservice.nomad
+    nomad job run -detach otel-demo-app/jobspec/shippingservice.nomad
+    nomad job run -detach otel-demo-app/jobspec/checkoutservice.nomad
+    nomad job run -detach otel-demo-app/jobspec/recommendationservice.nomad
+    nomad job run -detach otel-demo-app/jobspec/frontend.nomad
+    nomad job run -detach otel-demo-app/jobspec/loadgenerator.nomad
+    nomad job run -detach otel-demo-app/jobspec/frontendproxy.nomad
     ```
 
-    Test the PostgreSQL connection
-
+3. Test PostgreSQL
+ 
     ```bash
     pg_isready -d ffs -h ffspostgres.localhost -p 5432 -U ffs
     ```
@@ -60,21 +77,15 @@ Work in progress.
     psql -h ffspostgres.localhost -p 5432 -d ffs -U ffs
     ```
 
-3. Deploy Redis
-
-    ```bash
-    nomad job run otel-demo-app/jobspec/redis.nomad
-    ```
-
-    Test Redis connection:
-    
+4. Test Redis
+   
     ```bash
     redis-cli -h redis-cart.localhost -p 6379 PING
     ```
 
     >**NOTE:** Install the Redis CLI [here](https://redis.io/docs/getting-started/installation/).
 
-4. Deploy the OTel Collector
+5. Test the OTel Collector
 
     ```bash
     nomad job run otel-demo-app/jobspec/otel-collector.nomad
@@ -108,6 +119,29 @@ Work in progress.
 
     {"partialSuccess":{}}⏎  
     ```
+
+## Nuke deployments
+
+```bash
+nomad job stop -purge traefik
+nomad job stop -purge redis
+nomad job stop -purge ffspostgres
+nomad job stop -purge otel-collector
+nomad job stop -purge adservice
+nomad job stop -purge cartservice
+nomad job stop -purge currencyservice
+nomad job stop -purge emailservice
+nomad job stop -purge featureflagservice
+nomad job stop -purge paymentservice
+nomad job stop -purge productcatalogservice
+nomad job stop -purge quoteservice
+nomad job stop -purge shippingservice
+nomad job stop -purge checkoutservice
+nomad job stop -purge recommendationservice
+nomad job stop -purge frontend
+nomad job stop -purge frontendproxy
+nomad job stop -purge loadgenerator
+```
 
 ## Notes
 
@@ -156,7 +190,6 @@ paymentservice
 productcatalogservice
 quoteservice
 shippingservice
-
 checkoutservice
 recommendationservice
 frontend
