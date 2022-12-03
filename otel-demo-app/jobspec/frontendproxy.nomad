@@ -15,7 +15,8 @@ job "frontendproxy" {
     }
 
     service {
-      provider = "nomad"
+      // provider = "nomad"
+      name = "frontendproxy"
       tags = [
         "traefik.http.routers.frontendproxy.rule=Host(`frontendproxy.localhost`)",
         "traefik.http.routers.frontendproxy.entrypoints=web",
@@ -38,28 +39,59 @@ job "frontendproxy" {
  
       config {
         image = "otel/demo:v1.1.0-frontendproxy"
-
+        image_pull_timeout = "25m"
         ports = ["containerport"]
       }
+
+      restart {
+        attempts = 10
+        delay    = "15s"
+      }
+
       env {
         ENVOY_PORT = "8080"
         ENVOY_UID = "0"
-        FEATURE_FLAG_SERVICE_HOST = "feature-flag-service.localhost"
-        FEATURE_FLAG_SERVICE_PORT = "80"
-        FRONTEND_HOST = "frontend.localhost"
-        FRONTEND_PORT = "80"
+        // FEATURE_FLAG_SERVICE_HOST = "feature-flag-service.localhost"
+        // FEATURE_FLAG_SERVICE_PORT = "80"
+        // FRONTEND_HOST = "frontend.localhost"
+        // FRONTEND_PORT = "80"
         GRAFANA_SERVICE_HOST = "grafana.localhost"
         GRAFANA_SERVICE_PORT = "80"
         JAEGER_SERVICE_HOST = "jaeger.localhost"
         JAEGER_SERVICE_PORT = "80"
-        LOCUST_WEB_HOST = "loadgenerator.localhost"
-        LOCUST_WEB_PORT = "80"
-        PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-http.localhost/v1/traces"
-      }      
+        // LOCUST_WEB_HOST = "loadgenerator.localhost"
+        // LOCUST_WEB_PORT = "80"
+        // PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-http.localhost/v1/traces"
+      }
+
+      template {
+        data = <<EOF
+{{ range service "featureflagservice-http" }}
+FEATURE_FLAG_SERVICE_HOST = "{{ .Address }}"
+FEATURE_FLAG_SERVICE_PORT = "{{ .Port }}"
+{{ end }}
+
+{{ range service "frontend" }}
+FRONTEND_HOST = "{{ .Address }}"
+FRONTEND_PORT = "{{ .Port }}"
+{{ end }}
+
+{{ range service "loadgenerator" }}
+LOCUST_WEB_HOST = "{{ .Address }}"
+LOCUST_WEB_PORT = "{{ .Port }}"
+{{ end }}
+
+{{ range service "otelcol-http" }}
+PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://{{ .Address }}:{{ .Port }}/v1/traces"
+{{ end }}
+EOF
+        destination = "local/env"
+        env         = true
+      }
 
       resources {
-        cpu    = 500
-        memory = 256
+        cpu    = 55
+        memory = 450
       }
 
     }

@@ -14,13 +14,14 @@ job "productcatalogservice" {
     }
 
     service {
-      provider = "nomad"
-      tags = [
-        "traefik.http.routers.productcatalogservice.rule=Host(`productcatalogservice.localhost`)",
-        "traefik.http.routers.productcatalogservice.entrypoints=web",
-        "traefik.http.routers.productcatalogservice.tls=false",
-        "traefik.enable=true",
-      ]
+      name = "productcatalogservice"
+      // provider = "nomad"
+      // tags = [
+      //   "traefik.http.routers.productcatalogservice.rule=Host(`productcatalogservice.localhost`)",
+      //   "traefik.http.routers.productcatalogservice.entrypoints=web",
+      //   "traefik.http.routers.productcatalogservice.tls=false",
+      //   "traefik.enable=true",
+      // ]
 
       port = "containerport"
 
@@ -37,21 +38,40 @@ job "productcatalogservice" {
  
       config {
         image = "otel/demo:v1.1.0-productcatalogservice"
-
+        image_pull_timeout = "10m"
         ports = ["containerport"]
       }
-      env {
-        FEATURE_FLAG_GRPC_SERVICE_ADDR = "featureflagservice.localhost:7233"
-        OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
-        OTEL_SERVICE_NAME = "productcatalogservice"
-        PRODUCT_CATALOG_SERVICE_PORT = "3550"
-      }      
 
-      resources {
-        cpu    = 500
-        memory = 256
+      restart {
+        attempts = 4
+        delay    = "15s"
       }
 
+      env {
+        // FEATURE_FLAG_GRPC_SERVICE_ADDR = "featureflagservice.localhost:7233"
+        // OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
+        OTEL_SERVICE_NAME = "productcatalogservice"
+        PRODUCT_CATALOG_SERVICE_PORT = "3550"
+      }
+
+      template {
+        data = <<EOF
+{{ range service "featureflagservice-grpc" }}
+FEATURE_FLAG_GRPC_SERVICE_ADDR = "{{ .Address }}:{{ .Port }}"
+{{ end }}
+
+{{ range service "otelcol-grpc" }}
+OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://{{ .Address }}:{{ .Port }}"
+{{ end }}
+EOF
+        destination = "local/env"
+        env         = true
+      }
+
+      resources {
+        cpu    = 55
+        memory = 150
+      }
     }
   }
 }

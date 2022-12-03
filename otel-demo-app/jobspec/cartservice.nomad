@@ -14,13 +14,14 @@ job "cartservice" {
     }
 
     service {
-      provider = "nomad"
-      tags = [
-        "traefik.http.routers.cartservice.rule=Host(`cartservice.localhost`)",
-        "traefik.http.routers.cartservice.entrypoints=web",
-        "traefik.http.routers.cartservice.tls=false",
-        "traefik.enable=true",
-      ]
+      name = "cartservice"
+      // provider = "nomad"
+      // tags = [
+      //   "traefik.http.routers.cartservice.rule=Host(`cartservice.localhost`)",
+      //   "traefik.http.routers.cartservice.entrypoints=web",
+      //   "traefik.http.routers.cartservice.tls=false",
+      //   "traefik.enable=true",
+      // ]
 
       port = "containerport"
 
@@ -37,20 +38,38 @@ job "cartservice" {
  
       config {
         image = "otel/demo:v1.1.0-cartservice"
-
+        image_pull_timeout = "10m"
         ports = ["containerport"]
       }
+
+      restart {
+        attempts = 4
+        delay    = "15s"
+      }
+
       env {
         ASPNETCORE_URLS = "http://*:7070"
         CART_SERVICE_PORT = "7070"
-        OTEL_EXPORTER_OTLP_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
         OTEL_SERVICE_NAME = "cartservice"
-        REDIS_ADDR = "redis-cart.localhost:6379"
-      }      
+      }
+
+      template {
+        data = <<EOF
+{{ range service "redis-service" }}
+REDIS_ADDR = "{{ .Address }}:{{ .Port }}"
+{{ end }}
+
+{{ range service "otelcol-grpc" }}
+OTEL_EXPORTER_OTLP_ENDPOINT = "http://{{ .Address }}:{{ .Port }}"
+{{ end }}
+EOF
+        destination = "local/env"
+        env         = true
+      }
 
       resources {
-        cpu    = 500
-        memory = 256
+        cpu    = 55
+        memory = 300
       }
 
     }

@@ -14,14 +14,7 @@ job "redis" {
     }
 
     service {
-      provider = "nomad"
-      tags = [
-        "traefik.http.routers.redis.rule=Host(`redis.localhost`)",
-        "traefik.http.routers.redis.entrypoints=web",
-        "traefik.http.routers.redis.tls=false",
-        "traefik.enable=true",
-      ]
-
+      name = "redis-service"
       port = "db"
 
       check {
@@ -41,10 +34,10 @@ job "redis" {
         ports = ["db"]
       }
 
-      // resources {
-      //   cpu    = 500
-      //   memory = 256
-      // }
+      resources {
+        cpu    = 55
+        memory = 150
+      }
 
     }
   }

@@ -14,7 +14,7 @@ job "ffspostgres" {
     network {
       
       port "db" {
-        static = 5432
+        to = 5432
       }
     }
 
@@ -29,27 +29,36 @@ job "ffspostgres" {
         POSTGRES_DB = "ffs"
         POSTGRES_PASSWORD = "ffs"
         POSTGRES_USER = "ffs"
-        OTEL_EXPORTER_OTLP_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
+        // OTEL_EXPORTER_OTLP_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
         OTEL_SERVICE_NAME = "ffspostgres"
       }
 
-      resources {
-        cpu    = 200
-        memory = 512
+      template {
+        data = <<EOF
+{{ range service "otelcol-grpc" }}
+OTEL_EXPORTER_OTLP_ENDPOINT = "http://{{ .Address }}:{{ .Port }}"
+{{ end }}
+
+EOF
+        destination = "local/env"
+        env         = true
       }
 
-    service {
-      provider = "nomad"
-      tags = [
-        "traefik.http.routers.ffspostgres.rule=Host(`ffspostgres.localhost`)",
-        "traefik.http.routers.ffspostgres.entrypoints=web",
-        "traefik.http.routers.ffspostgres.tls=false",
-        "traefik.enable=true",
-      ]
+      resources {
+        cpu    = 55
+        memory = 300
+      }
 
-      port = "db"
-
-    }
+      service {
+        name = "ffspostgres-service"
+        // provider = "nomad"
+        // tags = [
+        //   "traefik.tcp.routers.ffspostgres.rule=HostSNI(`*`)",
+        //   "traefik.tcp.routers.ffspostgres.entrypoints=grpc",
+        //   "traefik.enable=true",
+        // ]
+        port = "db"
+      }
 
     }
   }
