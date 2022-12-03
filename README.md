@@ -13,6 +13,7 @@ This is work in progress.
 * The `frontend` service is still flaky. It keeps re-starting periodically, especially if the `loadgenerator` is running.
 * I haven't gotten the `frontendproxy` running yet, as I haven't tried deploying the `grafana`, `prometheus`, and `jaeger` services.
 * Right now, I send all traces to [Lightstep](https://app.lightstep.com). Learn more about how to configure the OTel Collector on Nomad to send traces to Lightstep [here](https://medium.com/tucows/just-in-time-nomad-running-the-opentelemetry-collector-on-hashicorp-nomad-with-hashiqube-4eaf009b8382).
+
 ### Deployment Steps
 
 This assumes that you have HashiCorp Nomad, Consul, and Vault running somewhere. For a quick and easy local dev setup of the aforementioned tools, I highly recommend using [HashiQube](https://github.com/avillela/hashiqube).
@@ -35,7 +36,15 @@ This assumes that you have HashiCorp Nomad, Consul, and Vault running somewhere.
     127.0.0.1   redis-cart.localhost
     ```
 
-2. Deploy services
+2. Deploy Demo App services
+
+    First, set memory over-subscription per [this article](https://developer.hashicorp.com/nomad/docs/commands/operator/scheduler/set-config#memory-oversubscription), to deal with any memory funny business from services. This is a one-time, cluster-wide setting.
+
+    ```bash
+    nomad operator scheduler set-config -memory-oversubscription true
+    ```
+
+    Now, deploy the services.
 
     ```bash
     nomad job run -detach otel-demo-app/jobspec/traefik.nomad

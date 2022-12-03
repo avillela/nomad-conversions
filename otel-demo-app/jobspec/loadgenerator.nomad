@@ -78,7 +78,8 @@ EOF
 
       resources {
         cpu    = 55
-        memory = 500
+        memory = 1024
+        memory_max = 2048
       }
 
     }
