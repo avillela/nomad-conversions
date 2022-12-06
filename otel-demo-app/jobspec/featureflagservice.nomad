@@ -18,14 +18,6 @@ job "featureflagservice" {
 
     service {
       name = "featureflagservice-http"
-      // provider = "nomad"
-      // tags = [
-      //   "traefik.http.routers.featureflagservice.rule=Host(`featureflagservice.localhost`)",
-      //   "traefik.http.routers.featureflagservice.entrypoints=web",
-      //   "traefik.http.routers.featureflagservice.tls=false",
-      //   "traefik.enable=true",
-      // ]
-
       port = "http"
 
       check {
@@ -37,12 +29,6 @@ job "featureflagservice" {
 
     service {
       name = "featureflagservice-grpc"
-      // provider = "nomad"
-      // tags = [
-      //   "traefik.tcp.routers.featureflagservice-grpc.rule=HostSNI(`*`)",
-      //   "traefik.tcp.routers.featureflagservice-grpc.entrypoints=grpc",
-      //   "traefik.enable=true",
-      // ]        
       port = "grpc"
     }
 
@@ -63,11 +49,9 @@ job "featureflagservice" {
       }
 
       env {
-        // DATABASE_URL = "ecto://ffs:ffs@ffspostgres.localhost:7233/ffs"
-        FEATURE_FLAG_GRPC_SERVICE_PORT = "50053"
+        FEATURE_FLAG_GRPC_SERVICE_PORT = "${NOMAD_PORT_grpc}"
         FEATURE_FLAG_SERVICE_PATH_ROOT = "\"/feature\""
-        FEATURE_FLAG_SERVICE_PORT = "8081"
-        // OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
+        FEATURE_FLAG_SERVICE_PORT = "${NOMAD_PORT_http}"
         OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = "grpc"
         OTEL_SERVICE_NAME = "featureflagservice"
       }

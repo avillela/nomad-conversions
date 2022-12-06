@@ -15,14 +15,6 @@ job "loadgenerator" {
 
     service {
       name = "loadgenerator"
-      // provider = "nomad"
-      // tags = [
-      //   "traefik.http.routers.loadgenerator.rule=Host(`loadgenerator.localhost`)",
-      //   "traefik.http.routers.loadgenerator.entrypoints=web",
-      //   "traefik.http.routers.loadgenerator.tls=false",
-      //   "traefik.enable=true",
-      // ]
-
       port = "containerport"
 
       check {
@@ -52,11 +44,9 @@ job "loadgenerator" {
       env {
         LOCUST_AUTOSTART = "true"
         LOCUST_HEADLESS = "false"
-        // LOCUST_HOST = "http://frontend.localhost"
         LOCUST_USERS = "10"
-        LOCUST_WEB_PORT = "8089"
-        LOADGENERATOR_PORT = "8089"
-        // OTEL_EXPORTER_OTLP_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
+        LOCUST_WEB_PORT = "${NOMAD_PORT_containerport}"
+        LOADGENERATOR_PORT = "${NOMAD_PORT_containerport}"
         OTEL_SERVICE_NAME = "loadgenerator"
         PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION = "python"
       }

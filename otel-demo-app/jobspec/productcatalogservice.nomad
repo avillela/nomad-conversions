@@ -15,14 +15,6 @@ job "productcatalogservice" {
 
     service {
       name = "productcatalogservice"
-      // provider = "nomad"
-      // tags = [
-      //   "traefik.http.routers.productcatalogservice.rule=Host(`productcatalogservice.localhost`)",
-      //   "traefik.http.routers.productcatalogservice.entrypoints=web",
-      //   "traefik.http.routers.productcatalogservice.tls=false",
-      //   "traefik.enable=true",
-      // ]
-
       port = "containerport"
 
       check {
@@ -50,10 +42,8 @@ job "productcatalogservice" {
       }
 
       env {
-        // FEATURE_FLAG_GRPC_SERVICE_ADDR = "featureflagservice.localhost:7233"
-        // OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
         OTEL_SERVICE_NAME = "productcatalogservice"
-        PRODUCT_CATALOG_SERVICE_PORT = "3550"
+        PRODUCT_CATALOG_SERVICE_PORT = "${NOMAD_PORT_containerport}"
       }
 
       template {

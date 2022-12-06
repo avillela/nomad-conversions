@@ -15,14 +15,6 @@ job "quoteservice" {
 
     service {
       name = "quoteservice"
-      // provider = "nomad"
-      // tags = [
-      //   "traefik.http.routers.quoteservice.rule=Host(`quoteservice.localhost`)",
-      //   "traefik.http.routers.quoteservice.entrypoints=web",
-      //   "traefik.http.routers.quoteservice.tls=false",
-      //   "traefik.enable=true",
-      // ]
-
       port = "containerport"
 
       check {
@@ -50,13 +42,12 @@ job "quoteservice" {
       }
 
       env {
-        // OTEL_EXPORTER_OTLP_ENDPOINT = "http://otel-collector-http.localhost"
         OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = "http/protobuf"
         OTEL_PHP_TRACES_PROCESSOR = "simple"
         OTEL_SERVICE_NAME = "quoteservice"
         OTEL_TRACES_EXPORTER = "otlp"
         OTEL_TRACES_SAMPLER = "parentbased_always_on"
-        QUOTE_SERVICE_PORT = "8090"
+        QUOTE_SERVICE_PORT = "${NOMAD_PORT_containerport}"
       }
 
       template {

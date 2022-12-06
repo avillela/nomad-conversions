@@ -15,14 +15,6 @@ job "shippingservice" {
 
     service {
       name = "shippingservice"
-      // provider = "nomad"
-      // tags = [
-      //   "traefik.http.routers.shippingservice.rule=Host(`shippingservice.localhost`)",
-      //   "traefik.http.routers.shippingservice.entrypoints=web",
-      //   "traefik.http.routers.shippingservice.tls=false",
-      //   "traefik.enable=true",
-      // ]
-
       port = "containerport"
 
       check {
@@ -50,10 +42,8 @@ job "shippingservice" {
       }
 
       env {
-        // OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
         OTEL_SERVICE_NAME = "shippingservice"
-        // QUOTE_SERVICE_ADDR = "http://quoteservice.localhost"
-        SHIPPING_SERVICE_PORT = "50050"
+        SHIPPING_SERVICE_PORT = "${NOMAD_PORT_containerport}"
       }
 
       template {

@@ -15,14 +15,6 @@ job "checkoutservice" {
 
     service {
       name = "checkoutservice"
-      // provider = "nomad"
-      // tags = [
-      //   "traefik.http.routers.checkoutservice.rule=Host(`checkoutservice.localhost`)",
-      //   "traefik.http.routers.checkoutservice.entrypoints=web",
-      //   "traefik.http.routers.checkoutservice.tls=false",
-      //   "traefik.enable=true",
-      // ]
-
       port = "containerport"
 
       check {
@@ -50,17 +42,9 @@ job "checkoutservice" {
       }
 
       env {
-        // CART_SERVICE_ADDR = "cartservice.localhost"
-        CHECKOUT_SERVICE_PORT = "5050"
-        // CURRENCY_SERVICE_ADDR = "currencyservice.localhost"
-        // EMAIL_SERVICE_ADDR = "http://emailservice.localhost"
-        // OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
+        CHECKOUT_SERVICE_PORT = "${NOMAD_PORT_containerport}"
         OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = "cumulative"
-        // OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
         OTEL_SERVICE_NAME = "checkoutservice"
-        // PAYMENT_SERVICE_ADDR = "paymentservice.localhost"
-        // PRODUCT_CATALOG_SERVICE_ADDR = "productcatalogservice.localhost"
-        // SHIPPING_SERVICE_ADDR = "shippingservice.localhost"
       }
 
       template {

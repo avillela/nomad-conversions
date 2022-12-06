@@ -20,14 +20,6 @@ job "recommendationservice" {
 
     service {
       name = "recommendationservice"
-      // provider = "nomad"
-      // tags = [
-      //   "traefik.http.routers.recommendationservice.rule=Host(`recommendationservice.localhost`)",
-      //   "traefik.http.routers.recommendationservice.entrypoints=web",
-      //   "traefik.http.routers.recommendationservice.tls=false",
-      //   "traefik.enable=true",
-      // ]
-
       port = "containerport"
 
       check {
@@ -54,16 +46,13 @@ job "recommendationservice" {
         delay    = "15s"
       }
       env {
-        // FEATURE_FLAG_GRPC_SERVICE_ADDR = "featureflagservice.localhost"
-        // OTEL_EXPORTER_OTLP_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
         OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = "cumulative"
         OTEL_METRICS_EXPORTER = "otlp"
         OTEL_PYTHON_LOG_CORRELATION = "true"
         OTEL_SERVICE_NAME = "recommendationservice"
         OTEL_TRACES_EXPORTER = "otlp"
-        // PRODUCT_CATALOG_SERVICE_ADDR = "productcatalogservice.localhost"
         PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION = "python"
-        RECOMMENDATION_SERVICE_PORT = "9001"
+        RECOMMENDATION_SERVICE_PORT = "${NOMAD_PORT_containerport}"
       }
 
       template {

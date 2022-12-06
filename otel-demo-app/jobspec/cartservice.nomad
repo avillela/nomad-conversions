@@ -15,14 +15,6 @@ job "cartservice" {
 
     service {
       name = "cartservice"
-      // provider = "nomad"
-      // tags = [
-      //   "traefik.http.routers.cartservice.rule=Host(`cartservice.localhost`)",
-      //   "traefik.http.routers.cartservice.entrypoints=web",
-      //   "traefik.http.routers.cartservice.tls=false",
-      //   "traefik.enable=true",
-      // ]
-
       port = "containerport"
 
       check {
@@ -50,8 +42,8 @@ job "cartservice" {
       }
 
       env {
-        ASPNETCORE_URLS = "http://*:7070"
-        CART_SERVICE_PORT = "7070"
+        ASPNETCORE_URLS = "http://*:${NOMAD_PORT_containerport}"
+        CART_SERVICE_PORT = "${NOMAD_PORT_containerport}"
         OTEL_SERVICE_NAME = "cartservice"
       }
 

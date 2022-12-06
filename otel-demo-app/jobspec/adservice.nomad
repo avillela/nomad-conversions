@@ -20,14 +20,6 @@ job "adservice" {
 
     service {
       name = "adservice"
-      // provider = "nomad"
-      // tags = [
-      //   "traefik.http.routers.adservice.rule=Host(`adservice.localhost`)",
-      //   "traefik.http.routers.adservice.entrypoints=web",
-      //   "traefik.http.routers.adservice.tls=false",
-      //   "traefik.enable=true",
-      // ]
-
       port = "containerport"
 
       check {
@@ -55,7 +47,7 @@ job "adservice" {
       }
 
       env {
-          AD_SERVICE_PORT = "9555"
+          AD_SERVICE_PORT = "${NOMAD_PORT_containerport}"
           OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = "cumulative"
           OTEL_SERVICE_NAME = "adservice"
       }      
