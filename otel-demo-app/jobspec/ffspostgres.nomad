@@ -29,7 +29,6 @@ job "ffspostgres" {
         POSTGRES_DB = "ffs"
         POSTGRES_PASSWORD = "ffs"
         POSTGRES_USER = "ffs"
-        // OTEL_EXPORTER_OTLP_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
         OTEL_SERVICE_NAME = "ffspostgres"
       }
 
@@ -51,13 +50,20 @@ EOF
 
       service {
         name = "ffspostgres-service"
-        // provider = "nomad"
-        // tags = [
-        //   "traefik.tcp.routers.ffspostgres.rule=HostSNI(`*`)",
-        //   "traefik.tcp.routers.ffspostgres.entrypoints=grpc",
-        //   "traefik.enable=true",
-        // ]
         port = "db"
+
+        check {
+          interval = "10s"
+          timeout  = "5s"
+          type     = "script"
+          command  = "pg_isready"
+          args     = [
+            "-d", "ffs",
+            "-h", "${NOMAD_IP_db}",
+            "-p", "${NOMAD_PORT_db}",
+            "-U", "ffs"
+          ]
+        }
       }
 
     }

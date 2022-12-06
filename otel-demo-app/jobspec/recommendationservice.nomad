@@ -31,7 +31,8 @@ job "recommendationservice" {
       port = "containerport"
 
       check {
-        type     = "tcp"
+        type     = "grpc"
+        grpc_service = "recommendationservice"
         interval = "10s"
         timeout  = "5s"
       }
