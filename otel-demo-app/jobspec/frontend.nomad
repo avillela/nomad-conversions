@@ -109,7 +109,6 @@ PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://{{ .Address }}:{{ .Port }}/v
 EOF
         destination = "local/env"
         env         = true
-        change_mode   = "noop"
       }
 
       resources {

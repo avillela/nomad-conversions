@@ -74,7 +74,6 @@ OTEL_EXPORTER_OTLP_ENDPOINT = "http://{{ .Address }}:{{ .Port }}"
 EOF
         destination = "local/env"
         env         = true
-        change_mode   = "noop"
       }
 
 

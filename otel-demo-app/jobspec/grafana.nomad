@@ -74,7 +74,7 @@ job "grafana" {
 
 
       resources {
-        cpu    = 200 # 500 MHz
+        cpu    = 45 # 500 MHz
         memory = 256 # 256MB
       }
     }

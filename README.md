@@ -14,8 +14,7 @@ This is work in progress.
 * I haven't gotten the `frontendproxy` running yet, as I haven't tried deploying the `grafana`, `prometheus`, and `jaeger` services.
 * Right now, I send all traces to [Lightstep](https://app.lightstep.com). Learn more about how to configure the OTel Collector on Nomad to send traces to Lightstep [here](https://medium.com/tucows/just-in-time-nomad-running-the-opentelemetry-collector-on-hashicorp-nomad-with-hashiqube-4eaf009b8382).
 * When deploying the various jobspecs, they are erring out after x number of attempts. I believe that this has something to do with the # of restart attempts, especially when doing the initial download of the image?
-* When `frontend` is initially deployed, `checkoutservice` doesn't work (even though it looks fine), and needs to be restarted, followed by the `frontend`
-* When the `frontendproxy` service is started, it causes a number of the other services to plunge into chaos.
+* When `frontend` is initially deployed, `checkoutservice` doesn't work (even though it looks fine), and needs to be restarted, followed by the `frontend` (but it might be the `shippingservice`??)
 
 ### Deployment Steps
 
