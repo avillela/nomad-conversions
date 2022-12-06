@@ -46,6 +46,8 @@ job "frontendproxy" {
       restart {
         attempts = 10
         delay    = "15s"
+        interval = "2m"
+        mode     = "delay"
       }
 
       env {
@@ -91,7 +93,8 @@ EOF
 
       resources {
         cpu    = 55
-        memory = 450
+        memory = 500
+        memory_max = 1024
       }
 
     }

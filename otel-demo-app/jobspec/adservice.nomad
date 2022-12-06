@@ -50,6 +50,8 @@ job "adservice" {
       restart {
         attempts = 10
         delay    = "15s"
+        interval = "2m"
+        mode     = "delay"
       }
 
       env {
@@ -71,6 +73,7 @@ EOF
       resources {
         cpu    = 60
         memory = 450
+        memory_max = 650
       }
 
     }

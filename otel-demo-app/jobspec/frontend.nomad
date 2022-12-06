@@ -43,7 +43,7 @@ job "frontend" {
       }
 
       restart {
-        attempts = 4
+        attempts = 10
         delay    = "5s"
         interval = "5s"
         mode = "delay"
@@ -114,7 +114,7 @@ EOF
 
       resources {
         cpu    = 55
-        memory = 2048
+        memory = 1024
         memory_max = 2048
       }
 

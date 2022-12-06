@@ -43,8 +43,10 @@ job "checkoutservice" {
       }
 
       restart {
-        attempts = 4
+        attempts = 10
         delay    = "15s"
+        interval = "2m"
+        mode     = "delay"
       }
 
       env {
@@ -100,6 +102,7 @@ EOF
       resources {
         cpu    = 55
         memory = 200
+        memory_max = 500
       }
     }
   }

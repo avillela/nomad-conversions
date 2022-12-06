@@ -43,8 +43,10 @@ job "emailservice" {
       }
 
       restart {
-        attempts = 4
+        attempts = 10
         delay    = "15s"
+        interval = "2m"
+        mode     = "delay"
       }
 
       env {
