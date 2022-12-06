@@ -79,6 +79,16 @@ job "otel-collector" {
         HOST_VAR = "/hostfs/var"
     }
 
+//       template {
+//         data = <<EOF
+// {{ range service "jaeger-collector" }}
+// JAEGER_COLLECTOR = "{{ .Address }}:{{ .Port }}"
+// {{ end }}
+// EOF
+//         destination = "local/env"
+//         env         = true
+//       }
+
       template {
         data = <<EOH
 receivers:
@@ -102,20 +112,30 @@ exporters:
   logging:
     verbosity: detailed
 
+  otlp:
+    endpoint: '{{ range service "jaeger-collector" }}{{ .Address }}:{{ .Port }}{{ end }}'
+    tls:
+      insecure: true
+
   otlp/ls:
     endpoint: ingest.lightstep.com:443
     headers: 
       "lightstep-access-token": "{{ with secret "kv/data/otel/o11y/lightstep" }}{{ .Data.data.api_key }}{{ end }}"
 
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:{{ env "NOMAD_PORT_healthcheck" }}
+
 service:
+  extensions: [health_check]
   pipelines:
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, otlp/ls]
+      exporters: [logging, otlp, otlp/ls]
     traces:
       receivers: [otlp]
-      exporters: [logging, otlp/ls]
+      exporters: [logging, otlp, otlp/ls]
 
 EOH
 
@@ -129,43 +149,36 @@ EOH
       }
 
       service {
-        // provider = "nomad"
         // name = "otelcol-metrics"
         port = "metrics"
         tags = ["metrics"]
       }
       service {
-        // provider = "nomad"
         // name = "opentelemetry-collector"
         port = "prometheus"
         tags = ["prometheus"]
       }      
       service {
-        // provider = "nomad"
         // name = "opentelemetry-collector"
         port = "zipkin"
         tags = ["zipkin"]
       }
       service {
-        // provider = "nomad"
         // name = "opentelemetry-collector"
         port = "jaeger-compact"
         tags = ["jaeger-compact"]
       }
       service {
-        // provider = "nomad"
         // name = "opentelemetry-collector"
         port = "jaeger-grpc"
         tags = ["jaeger-grpc"]
       }
       service {
-        // provider = "nomad"
         // name = "opentelemetry-collector"
         port = "jaeger-thrift"
         tags = ["jaeger-thrift"]
       }
       service {
-        // provider = "nomad"
         name = "otelcol-grpc"
         tags = [
           "traefik.tcp.routers.otel-collector-grpc.rule=HostSNI(`*`)",
@@ -177,7 +190,6 @@ EOH
 
       service {
         name = "otelcol-http"
-        // provider = "nomad"
         tags = [
           "traefik.http.routers.otel-collector-http.rule=Host(`otel-collector-http.localhost`)",
           "traefik.http.routers.otel-collector-http.entrypoints=web",
@@ -187,6 +199,17 @@ EOH
         port = "otlp-http"
       }
 
+      service {
+        name = "otelcol-health"
+        port = "healthcheck"
+                                
+        check {
+          type     = "http"
+          path     = "/"
+          interval = "10s"
+          timeout  = "5s"
+        }
+      }
     }
   }
 }

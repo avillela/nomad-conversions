@@ -15,7 +15,6 @@ job "frontendproxy" {
     }
 
     service {
-      // provider = "nomad"
       name = "frontendproxy"
       tags = [
         "traefik.http.routers.frontendproxy.rule=Host(`frontendproxy.localhost`)",
@@ -46,26 +45,31 @@ job "frontendproxy" {
       restart {
         attempts = 10
         delay    = "15s"
+        interval = "2m"
+        mode     = "delay"
       }
 
       env {
-        ENVOY_PORT = "8080"
+        ENVOY_PORT = "${NOMAD_PORT_containerport}"
         ENVOY_UID = "0"
-        // FEATURE_FLAG_SERVICE_HOST = "feature-flag-service.localhost"
-        // FEATURE_FLAG_SERVICE_PORT = "80"
-        // FRONTEND_HOST = "frontend.localhost"
-        // FRONTEND_PORT = "80"
-        GRAFANA_SERVICE_HOST = "grafana.localhost"
-        GRAFANA_SERVICE_PORT = "80"
-        JAEGER_SERVICE_HOST = "jaeger.localhost"
-        JAEGER_SERVICE_PORT = "80"
-        // LOCUST_WEB_HOST = "loadgenerator.localhost"
-        // LOCUST_WEB_PORT = "80"
-        // PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-http.localhost/v1/traces"
+        // GRAFANA_SERVICE_HOST = "grafana.localhost"
+        // GRAFANA_SERVICE_PORT = "80"
+        // JAEGER_SERVICE_HOST = "jaeger.localhost"
+        // JAEGER_SERVICE_PORT = "80"
       }
 
       template {
         data = <<EOF
+{{ range service "grafana" }}
+GRAFANA_SERVICE_HOST = "{{ .Address }}"
+GRAFANA_SERVICE_PORT = "{{ .Port }}"
+{{ end }}
+
+{{ range service "jaeger-frontend" }}
+JAEGER_SERVICE_HOST = "{{ .Address }}"
+JAEGER_SERVICE_PORT = "{{ .Port }}"
+{{ end }}
+
 {{ range service "featureflagservice-http" }}
 FEATURE_FLAG_SERVICE_HOST = "{{ .Address }}"
 FEATURE_FLAG_SERVICE_PORT = "{{ .Port }}"
@@ -91,7 +95,8 @@ EOF
 
       resources {
         cpu    = 55
-        memory = 450
+        memory = 500
+        memory_max = 1024
       }
 
     }

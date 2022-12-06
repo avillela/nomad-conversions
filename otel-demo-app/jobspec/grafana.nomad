@@ -26,7 +26,7 @@ job "grafana" {
     }
 
     service {
-      provider = "nomad"
+      name = "grafana"
       tags = [
         "traefik.http.routers.grafana.rule=Host(`grafana.localhost`)",
         "traefik.http.routers.grafana.entrypoints=web",
@@ -53,14 +53,14 @@ job "grafana" {
         ports = ["http"]
       }
       artifact {
-        source      = "github.com/open-telemetry/opentelemetry-demo/src/grafana/provisioning"
-        destination = "/etc/grafana/provisioning"
+        source      = "github.com/open-telemetry/opentelemetry-demo/src/grafana"
+        destination = "/etc/grafana"
       }
 
-      artifact {
-        source      = "github.com/open-telemetry/opentelemetry-demo/src/grafana/grafana.ini"
-        destination = "/etc/grafana/grafana.ini"
-      }
+      // artifact {
+      //   source      = "github.com/open-telemetry/opentelemetry-demo/src/grafana/grafana.ini"
+      //   destination = "/etc/grafana/grafana.ini"
+      // }
 
       env {
         GF_PATHS_DATA = "/var/lib/grafana/"
@@ -74,8 +74,8 @@ job "grafana" {
 
 
       resources {
-        cpu    = 200 # 500 MHz
-        memory = 256 # 256MB
+        cpu    = 45 # 500 MHz
+        memory = 100 # 256MB
       }
     }
   }

@@ -15,14 +15,6 @@ job "paymentservice" {
 
     service {
       name = "paymentservice"
-      // provider = "nomad"
-      // tags = [
-      //   "traefik.http.routers.paymentservice.rule=Host(`paymentservice.localhost`)",
-      //   "traefik.http.routers.paymentservice.entrypoints=web",
-      //   "traefik.http.routers.paymentservice.tls=false",
-      //   "traefik.enable=true",
-      // ]
-
       port = "containerport"
 
       check {
@@ -43,16 +35,16 @@ job "paymentservice" {
       }
 
       restart {
-        attempts = 4
+        attempts = 10
         delay    = "15s"
+        interval = "2m"
+        mode     = "delay"
       }
 
       env {
-        // OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
         OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = "cumulative"
-        // OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
         OTEL_SERVICE_NAME = "paymentservice"
-        PAYMENT_SERVICE_PORT = "50051"
+        PAYMENT_SERVICE_PORT = "${NOMAD_PORT_containerport}"
       }
 
       template {

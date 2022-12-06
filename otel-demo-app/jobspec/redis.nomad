@@ -18,9 +18,16 @@ job "redis" {
       port = "db"
 
       check {
-        type     = "tcp"
         interval = "10s"
         timeout  = "5s"
+        type     = "script"
+        task     = "redis"
+        command  = "redis-cli"
+        args     = [
+          "-h", "${NOMAD_IP_db}",
+          "-p", "${NOMAD_PORT_db}",
+          "PING"
+        ]
       }
     }
 

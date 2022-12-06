@@ -15,14 +15,6 @@ job "currencyservice" {
 
     service {
       name = "currencyservice"
-      // provider = "nomad"
-      // tags = [
-      //   "traefik.http.routers.currencyservice.rule=Host(`currencyservice.localhost`)",
-      //   "traefik.http.routers.currencyservice.entrypoints=web",
-      //   "traefik.http.routers.currencyservice.tls=false",
-      //   "traefik.enable=true",
-      // ]
-
       port = "containerport"
 
       check {
@@ -32,7 +24,6 @@ job "currencyservice" {
       }
     }
 
- 
     task "currencyservice" {
       driver = "docker"
  
@@ -43,13 +34,14 @@ job "currencyservice" {
       }
 
       restart {
-        attempts = 4
+        attempts = 10
         delay    = "15s"
+        interval = "2m"
+        mode     = "delay"
       }
 
       env {
-        CURRENCY_SERVICE_PORT = "7001"
-        // OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
+        CURRENCY_SERVICE_PORT = "${NOMAD_PORT_containerport}"
         OTEL_RESOURCE_ATTRIBUTES = "service.name=currencyservice"
       }
 

@@ -15,7 +15,6 @@ job "frontend" {
 
     service {
       name = "frontend"
-      // provider = "nomad"
       tags = [
         "traefik.http.routers.frontend.rule=Host(`frontend.localhost`)",
         "traefik.http.routers.frontend.entrypoints=web",
@@ -43,28 +42,18 @@ job "frontend" {
       }
 
       restart {
-        attempts = 4
+        attempts = 10
         delay    = "5s"
         interval = "5s"
         mode = "delay"
       }
 
       env {
-        // AD_SERVICE_ADDR = "adservice.localhost"
-        // CART_SERVICE_ADDR = "cartservice.localhost"
-        // CHECKOUT_SERVICE_ADDR = "checkoutservice.localhost"
-        // CURRENCY_SERVICE_ADDR = "currencyservice.localhost"
         ENV_PLATFORM = "local"
         FRONTEND_ADDR = "frontend.localhost"
-        // OTEL_EXPORTER_OTLP_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
-        // OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-grpc.localhost:7233"
         OTEL_RESOURCE_ATTRIBUTES = "service.name=frontend"
         OTEL_SERVICE_NAME = "frontend"
-        PORT = "8080"
-        // PRODUCT_CATALOG_SERVICE_ADDR = "productcatalogservice.localhost"
-        // PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://otel-collector-http.localhost/v1/traces"
-        // RECOMMENDATION_SERVICE_ADDR = "recommendationservice.localhost"
-        // SHIPPING_SERVICE_ADDR = "shippingservice.localhost"
+        PORT = "${NOMAD_PORT_containerport}"
       }
 
       template {
@@ -109,12 +98,12 @@ PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://{{ .Address }}:{{ .Port }}/v
 EOF
         destination = "local/env"
         env         = true
-        change_mode   = "noop"
       }
 
       resources {
         cpu    = 55
         memory = 1024
+        memory_max = 2048
       }
 
     }
