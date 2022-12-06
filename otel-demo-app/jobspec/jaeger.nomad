@@ -5,7 +5,7 @@ job "jaeger" {
     count = 1
 
     network {
-      mode = "bridge"
+      mode = "host"
 
       port "frontend" {
         to = 16686
@@ -18,12 +18,11 @@ job "jaeger" {
 
     service {
       name = "jaeger-collector"
-      tags = [
-        "traefik.tcp.routers.jaeger-grpc.rule=HostSNI(`*`)",
-        "traefik.tcp.routers.jaeger-grpc.entrypoints=grpc",
-        "traefik.enable=true",
-      ]        
-
+      // tags = [
+      //   "traefik.tcp.routers.jaeger-grpc.rule=HostSNI(`*`)",
+      //   "traefik.tcp.routers.jaeger-grpc.entrypoints=grpc",
+      //   "traefik.enable=true",
+      // ]        
       port = "collector"
     }
 
@@ -57,8 +56,8 @@ job "jaeger" {
       }
 
       resources {
-        cpu    = 100
-        memory = 512
+        cpu    = 55
+        memory = 150
       }
     }
   }

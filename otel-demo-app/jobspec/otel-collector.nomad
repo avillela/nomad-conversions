@@ -79,6 +79,16 @@ job "otel-collector" {
         HOST_VAR = "/hostfs/var"
     }
 
+//       template {
+//         data = <<EOF
+// {{ range service "jaeger-collector" }}
+// JAEGER_COLLECTOR = "{{ .Address }}:{{ .Port }}"
+// {{ end }}
+// EOF
+//         destination = "local/env"
+//         env         = true
+//       }
+
       template {
         data = <<EOH
 receivers:
@@ -102,6 +112,11 @@ exporters:
   logging:
     verbosity: detailed
 
+  otlp:
+    endpoint: '{{ range service "jaeger-collector" }}{{ .Address }}:{{ .Port }}{{ end }}'
+    tls:
+      insecure: true
+
   otlp/ls:
     endpoint: ingest.lightstep.com:443
     headers: 
@@ -117,10 +132,10 @@ service:
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, otlp/ls]
+      exporters: [logging, otlp, otlp/ls]
     traces:
       receivers: [otlp]
-      exporters: [logging, otlp/ls]
+      exporters: [logging, otlp, otlp/ls]
 
 EOH
 

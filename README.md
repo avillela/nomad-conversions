@@ -67,9 +67,15 @@ This assumes that you have HashiCorp Nomad, Consul, and Vault running somewhere.
     nomad job run -detach otel-demo-app/jobspec/frontend.nomad
     nomad job run -detach otel-demo-app/jobspec/loadgenerator.nomad
     nomad job run -detach otel-demo-app/jobspec/frontendproxy.nomad
+    nomad job run -detach otel-demo-app/jobspec/grafana.nomad
+    nomad job run -detach otel-demo-app/jobspec/jaeger.nomad
     ```
 
-    The frontend can be accessed via: `http://frontend.localhost` or `http://frontendproxy.localhost`
+    Webstore             `http://frontendproxy.localhost/`
+    Grafana              `http://frontendproxy.localhost/grafana/` (not working - use `http://grafana.localhost` for now)
+    Feature Flags UI     `http://frontendproxy.localhost/feature/`
+    Load Generator UI    `http://frontendproxy.localhost/loadgen/`
+    Jaeger UI            `http://frontendproxy.localhost/jaeger/ui/`
 
 ### Nuke deployments
 
@@ -92,6 +98,8 @@ nomad job stop -purge recommendationservice
 nomad job stop -purge frontend
 nomad job stop -purge frontendproxy
 nomad job stop -purge loadgenerator
+nomad job stop -purge grafana
+nomad job stop -purge jaeger
 ```
 
 ## Service Startup Order

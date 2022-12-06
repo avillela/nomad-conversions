@@ -52,14 +52,24 @@ job "frontendproxy" {
       env {
         ENVOY_PORT = "${NOMAD_PORT_containerport}"
         ENVOY_UID = "0"
-        GRAFANA_SERVICE_HOST = "grafana.localhost"
-        GRAFANA_SERVICE_PORT = "80"
-        JAEGER_SERVICE_HOST = "jaeger.localhost"
-        JAEGER_SERVICE_PORT = "80"
+        // GRAFANA_SERVICE_HOST = "grafana.localhost"
+        // GRAFANA_SERVICE_PORT = "80"
+        // JAEGER_SERVICE_HOST = "jaeger.localhost"
+        // JAEGER_SERVICE_PORT = "80"
       }
 
       template {
         data = <<EOF
+{{ range service "grafana" }}
+GRAFANA_SERVICE_HOST = "{{ .Address }}"
+GRAFANA_SERVICE_PORT = "{{ .Port }}"
+{{ end }}
+
+{{ range service "jaeger-frontend" }}
+JAEGER_SERVICE_HOST = "{{ .Address }}"
+JAEGER_SERVICE_PORT = "{{ .Port }}"
+{{ end }}
+
 {{ range service "featureflagservice-http" }}
 FEATURE_FLAG_SERVICE_HOST = "{{ .Address }}"
 FEATURE_FLAG_SERVICE_PORT = "{{ .Port }}"
