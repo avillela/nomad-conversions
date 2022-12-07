@@ -28,14 +28,11 @@ This assumes that you have HashiCorp Nomad, Consul, and Vault running somewhere.
     ```bash
     # For HashiQube
     127.0.0.1   traefik.localhost
-    127.0.0.1   otel-collector-http.localhost
-    127.0.0.1   otel-collector-grpc.localhost
-    127.0.0.1   ffspostgres.localhost
     127.0.0.1   frontend.localhost
     127.0.0.1   frontendproxy.localhost
     127.0.0.1   grafana.localhost
-    127.0.0.1   jaeger.localhost
-    127.0.0.1   redis-cart.localhost
+    127.0.0.1   jaeger-ui.localhost
+    127.0.0.1   prometheus.localhost
     ```
 
 2. Deploy Demo App services

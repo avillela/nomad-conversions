@@ -60,10 +60,10 @@ job "grafana" {
         mode     = "delay"
       }
 
-      // artifact {
-      //   source      = "github.com/open-telemetry/opentelemetry-demo/src/grafana/provisioning"
-      //   destination = "/etc/grafana/provisioning"
-      // }
+      artifact {
+        source      = "github.com/open-telemetry/opentelemetry-demo/src/grafana/provisioning"
+        destination = "/etc/grafana/provisioning"
+      }
 
       // artifact {
       //   source      = "github.com/open-telemetry/opentelemetry-demo/src/grafana/grafana.ini"
