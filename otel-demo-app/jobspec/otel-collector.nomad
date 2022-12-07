@@ -52,7 +52,7 @@ job "otel-collector" {
 
       config {
         image = "otel/opentelemetry-collector-contrib:0.64.1"
-
+        image_pull_timeout = "25m"
         entrypoint = [
           "/otelcol-contrib",
           "--config=local/config/otel-collector-config.yaml",
@@ -70,6 +70,13 @@ job "otel-collector" {
         ]
       }
 
+      restart {
+        attempts = 10
+        delay    = "15s"
+        interval = "2m"
+        mode     = "delay"
+      }
+
       env {
         HOST_DEV = "/hostfs/dev"
         HOST_ETC = "/hostfs/etc"
@@ -78,16 +85,6 @@ job "otel-collector" {
         HOST_SYS = "/hostfs/sys"
         HOST_VAR = "/hostfs/var"
     }
-
-//       template {
-//         data = <<EOF
-// {{ range service "jaeger-collector" }}
-// JAEGER_COLLECTOR = "{{ .Address }}:{{ .Port }}"
-// {{ end }}
-// EOF
-//         destination = "local/env"
-//         env         = true
-//       }
 
       template {
         data = <<EOH

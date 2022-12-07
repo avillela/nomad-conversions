@@ -5,10 +5,10 @@ job "recommendationservice" {
   group "recommendationservice" {
     count = 1
 
-    update {
-      healthy_deadline  = "20m"
-      progress_deadline = "25m"
-    }
+    // update {
+    //   healthy_deadline  = "20m"
+    //   progress_deadline = "25m"
+    // }
 
     network {
       mode = "host"
@@ -42,8 +42,10 @@ job "recommendationservice" {
 
       // https://developer.hashicorp.com/nomad/docs/job-specification/restart#restart-parameters
       restart {
-        attempts = 5
+        attempts = 10
         delay    = "15s"
+        interval = "2m"
+        mode     = "delay"
       }
       env {
         OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = "cumulative"

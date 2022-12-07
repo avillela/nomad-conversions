@@ -49,13 +49,21 @@ job "grafana" {
 
       config {
         image = "grafana/grafana:9.1.0"
-
+        image_pull_timeout = "25m"
         ports = ["http"]
       }
-      artifact {
-        source      = "github.com/open-telemetry/opentelemetry-demo/src/grafana"
-        destination = "/etc/grafana"
+
+      restart {
+        attempts = 10
+        delay    = "15s"
+        interval = "2m"
+        mode     = "delay"
       }
+
+      // artifact {
+      //   source      = "github.com/open-telemetry/opentelemetry-demo/src/grafana/provisioning"
+      //   destination = "/etc/grafana/provisioning"
+      // }
 
       // artifact {
       //   source      = "github.com/open-telemetry/opentelemetry-demo/src/grafana/grafana.ini"
@@ -63,19 +71,83 @@ job "grafana" {
       // }
 
       env {
-        GF_PATHS_DATA = "/var/lib/grafana/"
-        GF_PATHS_LOGS = "/var/log/grafana"
-        GF_PATHS_PLUGINS = "/var/lib/grafana/plugins"
+        GF_AUTH_ANONYMOUS_ENABLED  = "true"
+        GF_AUTH_ANONYMOUS_ORG_ROLE = "Editor"
+        GF_SERVER_HTTP_PORT        = "${NOMAD_PORT_http}"
+
+        // GF_PATHS_DATA = "/var/lib/grafana/"
+        // GF_PATHS_LOGS = "/var/log/grafana"
+        // GF_PATHS_PLUGINS = "/var/lib/grafana/plugins"
         GF_LOG_LEVEL = "DEBUG"
         GF_LOG_MODE = "console"
-        GF_SERVER_HTTP_PORT = "${NOMAD_PORT_http}"
-        GF_PATHS_PROVISIONING = "/etc/grafana/provisioning"
+        // GF_PATHS_PROVISIONING = "/etc/grafana/provisioning"
       }
 
+      template {
+        data = <<EOH
+[analytics]
+check_for_updates = true
+[auth]
+disable_login_form = true
+[auth.anonymous]
+enabled = true
+org_name = Main Org.
+org_role = Admin
+[grafana_net]
+url = https://grafana.net
+[log]
+mode = console
+[paths]
+data = /var/lib/grafana/
+logs = /var/log/grafana
+plugins = /var/lib/grafana/plugins
+provisioning = /etc/grafana/provisioning
+[server]
+root_url = http://frontendproxy.localhost/grafana
+serve_from_sub_path = true
+EOH
+        destination = "/etc/grafana/grafana.ini"
+      }
+
+      template {
+        data = <<EOH
+apiVersion: 1
+datasources:
+- editable: true
+  isDefault: true
+  name: Prometheus
+  type: prometheus
+  uid: webstore-metrics
+  url: http://{{ range service "prometheus" }}{{ .Address }}:{{ .Port }}{{ end }}
+- editable: true
+  isDefault: false
+  name: Jaeger
+  type: jaeger
+  uid: webstore-traces
+  url: http://{{ range service "jaeger-collector" }}{{ .Address }}:{{ .Port }}{{ end }}
+EOH
+        destination = "/etc/grafana/provisioning/datasources/datasources.yaml"
+      }
+
+      template {
+        data = <<EOH
+apiVersion: 1
+providers:
+- disableDeletion: false
+  editable: true
+  folder: ""
+  name: default
+  options:
+    path: /var/lib/grafana/dashboards/default
+  orgId: 1
+  type: file
+EOH
+        destination = "/etc/grafana/provisioning/dashboards/dashboardproviders.yaml"
+      }
 
       resources {
-        cpu    = 45 # 500 MHz
-        memory = 100 # 256MB
+        cpu    = 60
+        memory = 100
       }
     }
   }
