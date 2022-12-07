@@ -101,25 +101,6 @@ nomad job stop -purge grafana
 nomad job stop -purge jaeger
 ```
 
-## Service Startup Order
-
-redis
-ffspostgres
-otel-collector
-adservice - a little finnicky to start up, so might need to restart
-cartservice
-currencyservice
-emailservice
-featureflagservice
-paymentservice
-productcatalogservice
-quoteservice
-shippingservice
-checkoutservice
-recommendationservice
-frontend
-frontendproxy
-loadgenerator
 ## Notes
 
 ### Communication Between Services
@@ -146,10 +127,3 @@ EOF
 This pulls the IP and port of a service based on its Consul name, and sets it ato an environment variable.
 
 See reference [here](https://discuss.hashicorp.com/t/i-dont-understand-networking-between-services/24470/3).
-
-### Docker Image Pull Timeout
-
-It may take a while to pull the `recommendationservice` (and possibly others) image. In order to prevent timeout issues, set the `image_pull_timeout` in the `config` section of the `task` stanza, as per [the docs](https://developer.hashicorp.com/nomad/docs/drivers/docker#image_pull_timeout).
-
-You may also wish to set `restart` configs in the `task` stanza as well, as per [the docs](https://developer.hashicorp.com/nomad/docs/job-specification/restart#restart-parameters).
-
