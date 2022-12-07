@@ -68,7 +68,6 @@ job "grafana" {
 
       artifact {
         source      = "github.com/open-telemetry/opentelemetry-demo/src/grafana/provisioning/dashboards"
-        // destination = "/etc/grafana/provisioning"
         destination = "local/provisioning/dashboards"
       }
 
@@ -83,7 +82,6 @@ job "grafana" {
         GF_LOG_LEVEL = "DEBUG"
         GF_LOG_MODE = "console"
         GF_PATHS_PROVISIONING = "/etc/grafana/provisioning"
-        // GF_PATHS_PROVISIONING = "/local/provisioning"
       }
 
       template {
@@ -106,7 +104,10 @@ logs = /var/log/grafana
 plugins = /var/lib/grafana/plugins
 ;provisioning = /etc/grafana/provisioning
 [server]
-root_url = http://frontendproxy.localhost/grafana
+protocol = http
+domain = frontendproxy.localhost
+http_port = 80
+root_url = %(protocol)s://%(domain)s:%(http_port)s/grafana
 serve_from_sub_path = true
 EOH
         destination = "local/config/grafana.ini"
@@ -129,7 +130,7 @@ datasources:
   uid: webstore-traces
   url: http://{{ range service "jaeger-collector" }}{{ .Address }}:{{ .Port }}{{ end }}
 EOH
-        // destination = "local/config/provisioning/datasources/datasources.yaml"
+
         destination = "local/provisioning/datasources/datasources.yaml"
       }
 

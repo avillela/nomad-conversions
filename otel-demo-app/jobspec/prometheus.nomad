@@ -49,22 +49,16 @@ job "prometheus" {
 global:
   evaluation_interval: 30s
   scrape_interval: 5s
-  scrape_timeout: 3s
-rule_files:
-- /etc/config/recording_rules.yml
-- /etc/config/alerting_rules.yml
-- /etc/config/rules
-- /etc/config/alerts
 scrape_configs:
-- job_name: opentelemetry-community-demo
-  nomad_sd_configs:
-    - server: 'http://{{ env "attr.unique.network.ip-address" }}:4646'
-  relabel_configs:
-    - source_labels: ['__meta_nomad_tags']
-      regex: '(.*),metrics,(.*)'
-      action: keep
-    - source_labels: [__meta_nomad_service]
-      target_label: job
+- job_name: otel
+  static_configs:
+  - targets:
+    - '{{ range service "otelcol-prometheus" }}{{ .Address }}:{{ .Port }}{{ end }}'
+- job_name: otel-collector
+  static_configs:
+  - targets:
+    - '{{ range service "otelcol-metrics" }}{{ .Address }}:{{ .Port }}{{ end }}'
+
 EOH
 
         change_mode   = "signal"

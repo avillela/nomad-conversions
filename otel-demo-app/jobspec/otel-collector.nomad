@@ -98,6 +98,9 @@ receivers:
 processors:
   batch:
     timeout: 10s
+  spanmetrics:
+    metrics_exporter: prometheus
+
   memory_limiter:
     # 75% of maximum memory up to 4G
     limit_mib: 1536
@@ -108,6 +111,9 @@ processors:
 exporters:
   logging:
     verbosity: detailed
+
+  prometheus:
+    endpoint: "0.0.0.0:{{ env "NOMAD_PORT_prometheus" }}"
 
   otlp:
     endpoint: '{{ range service "jaeger-collector" }}{{ .Address }}:{{ .Port }}{{ end }}'
@@ -129,9 +135,10 @@ service:
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, otlp, otlp/ls]
+      exporters: [prometheus, logging, otlp/ls]
     traces:
       receivers: [otlp]
+      processors: [spanmetrics, batch]
       exporters: [logging, otlp, otlp/ls]
 
 EOH
@@ -146,12 +153,12 @@ EOH
       }
 
       service {
-        // name = "otelcol-metrics"
+        name = "otelcol-metrics"
         port = "metrics"
         tags = ["metrics"]
       }
       service {
-        // name = "opentelemetry-collector"
+        name = "otelcol-prometheus"
         port = "prometheus"
         tags = ["prometheus"]
       }      
