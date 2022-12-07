@@ -23,6 +23,7 @@ job "ffspostgres" {
 
       config {
         image = "postgres:14"
+        image_pull_timeout = "25m"
         ports = ["db"]
       }
       env {
@@ -41,6 +42,13 @@ OTEL_EXPORTER_OTLP_ENDPOINT = "http://{{ .Address }}:{{ .Port }}"
 EOF
         destination = "local/env"
         env         = true
+      }
+
+      restart {
+        attempts = 10
+        delay    = "15s"
+        interval = "2m"
+        mode     = "delay"
       }
 
       resources {

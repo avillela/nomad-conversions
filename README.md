@@ -28,14 +28,11 @@ This assumes that you have HashiCorp Nomad, Consul, and Vault running somewhere.
     ```bash
     # For HashiQube
     127.0.0.1   traefik.localhost
-    127.0.0.1   otel-collector-http.localhost
-    127.0.0.1   otel-collector-grpc.localhost
-    127.0.0.1   ffspostgres.localhost
     127.0.0.1   frontend.localhost
     127.0.0.1   frontendproxy.localhost
     127.0.0.1   grafana.localhost
-    127.0.0.1   jaeger.localhost
-    127.0.0.1   redis-cart.localhost
+    127.0.0.1   jaeger-ui.localhost
+    127.0.0.1   prometheus.localhost
     ```
 
 2. Deploy Demo App services
@@ -69,13 +66,15 @@ This assumes that you have HashiCorp Nomad, Consul, and Vault running somewhere.
     nomad job run -detach otel-demo-app/jobspec/frontendproxy.nomad
     nomad job run -detach otel-demo-app/jobspec/grafana.nomad
     nomad job run -detach otel-demo-app/jobspec/jaeger.nomad
+    nomad job run -detach otel-demo-app/jobspec/prometheus.nomad
     ```
 
     Webstore             `http://frontendproxy.localhost/`
-    Grafana              `http://frontendproxy.localhost/grafana/` (not working - use `http://grafana.localhost` for now)
+    Grafana              `http://frontendproxy.localhost/grafana/` or `http://grafana.localhost`
     Feature Flags UI     `http://frontendproxy.localhost/feature/`
     Load Generator UI    `http://frontendproxy.localhost/loadgen/`
-    Jaeger UI            `http://frontendproxy.localhost/jaeger/ui/`
+    Jaeger UI            `http://frontendproxy.localhost/jaeger/ui/` or `http://jaeger-ui.localhost`
+    Prometheus UI         `http://prometheus.localhost`
 
 ### Nuke deployments
 
@@ -102,25 +101,6 @@ nomad job stop -purge grafana
 nomad job stop -purge jaeger
 ```
 
-## Service Startup Order
-
-redis
-ffspostgres
-otel-collector
-adservice - a little finnicky to start up, so might need to restart
-cartservice
-currencyservice
-emailservice
-featureflagservice
-paymentservice
-productcatalogservice
-quoteservice
-shippingservice
-checkoutservice
-recommendationservice
-frontend
-frontendproxy
-loadgenerator
 ## Notes
 
 ### Communication Between Services
@@ -147,10 +127,3 @@ EOF
 This pulls the IP and port of a service based on its Consul name, and sets it ato an environment variable.
 
 See reference [here](https://discuss.hashicorp.com/t/i-dont-understand-networking-between-services/24470/3).
-
-### Docker Image Pull Timeout
-
-It may take a while to pull the `recommendationservice` (and possibly others) image. In order to prevent timeout issues, set the `image_pull_timeout` in the `config` section of the `task` stanza, as per [the docs](https://developer.hashicorp.com/nomad/docs/drivers/docker#image_pull_timeout).
-
-You may also wish to set `restart` configs in the `task` stanza as well, as per [the docs](https://developer.hashicorp.com/nomad/docs/job-specification/restart#restart-parameters).
-

@@ -37,8 +37,15 @@ job "redis" {
  
       config {
         image = "redis:alpine"
-
+        image_pull_timeout = "25m"
         ports = ["db"]
+      }
+
+      restart {
+        attempts = 10
+        delay    = "15s"
+        interval = "2m"
+        mode     = "delay"
       }
 
       resources {
