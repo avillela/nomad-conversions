@@ -66,13 +66,15 @@ This assumes that you have HashiCorp Nomad, Consul, and Vault running somewhere.
     nomad job run -detach otel-demo-app/jobspec/frontendproxy.nomad
     nomad job run -detach otel-demo-app/jobspec/grafana.nomad
     nomad job run -detach otel-demo-app/jobspec/jaeger.nomad
+    nomad job run -detach otel-demo-app/jobspec/prometheus.nomad
     ```
 
     Webstore             `http://frontendproxy.localhost/`
-    Grafana              `http://frontendproxy.localhost/grafana/` (not working - use `http://grafana.localhost` for now)
+    Grafana              `http://frontendproxy.localhost/grafana/` or `http://grafana.localhost`
     Feature Flags UI     `http://frontendproxy.localhost/feature/`
     Load Generator UI    `http://frontendproxy.localhost/loadgen/`
-    Jaeger UI            `http://frontendproxy.localhost/jaeger/ui/`
+    Jaeger UI            `http://frontendproxy.localhost/jaeger/ui/` or `http://jaeger-ui.localhost`
+    Prometheus UI         `http://prometheus.localhost`
 
 ### Nuke deployments
 

@@ -51,6 +51,12 @@ job "grafana" {
         image = "grafana/grafana:9.1.0"
         image_pull_timeout = "25m"
         ports = ["http"]
+
+        volumes = [
+          "local/config:/etc/grafana",
+          "local/provisioning:/etc/grafana/provisioning",
+        ]
+
       }
 
       restart {
@@ -61,26 +67,23 @@ job "grafana" {
       }
 
       artifact {
-        source      = "github.com/open-telemetry/opentelemetry-demo/src/grafana/provisioning"
-        destination = "/etc/grafana/provisioning"
+        source      = "github.com/open-telemetry/opentelemetry-demo/src/grafana/provisioning/dashboards"
+        // destination = "/etc/grafana/provisioning"
+        destination = "local/provisioning/dashboards"
       }
-
-      // artifact {
-      //   source      = "github.com/open-telemetry/opentelemetry-demo/src/grafana/grafana.ini"
-      //   destination = "/etc/grafana/grafana.ini"
-      // }
 
       env {
         GF_AUTH_ANONYMOUS_ENABLED  = "true"
         GF_AUTH_ANONYMOUS_ORG_ROLE = "Editor"
         GF_SERVER_HTTP_PORT        = "${NOMAD_PORT_http}"
 
-        // GF_PATHS_DATA = "/var/lib/grafana/"
-        // GF_PATHS_LOGS = "/var/log/grafana"
-        // GF_PATHS_PLUGINS = "/var/lib/grafana/plugins"
+        GF_PATHS_DATA = "/var/lib/grafana/"
+        GF_PATHS_LOGS = "/var/log/grafana"
+        GF_PATHS_PLUGINS = "/var/lib/grafana/plugins"
         GF_LOG_LEVEL = "DEBUG"
         GF_LOG_MODE = "console"
-        // GF_PATHS_PROVISIONING = "/etc/grafana/provisioning"
+        GF_PATHS_PROVISIONING = "/etc/grafana/provisioning"
+        // GF_PATHS_PROVISIONING = "/local/provisioning"
       }
 
       template {
@@ -101,12 +104,12 @@ mode = console
 data = /var/lib/grafana/
 logs = /var/log/grafana
 plugins = /var/lib/grafana/plugins
-provisioning = /etc/grafana/provisioning
+;provisioning = /etc/grafana/provisioning
 [server]
 root_url = http://frontendproxy.localhost/grafana
 serve_from_sub_path = true
 EOH
-        destination = "/etc/grafana/grafana.ini"
+        destination = "local/config/grafana.ini"
       }
 
       template {
@@ -126,23 +129,8 @@ datasources:
   uid: webstore-traces
   url: http://{{ range service "jaeger-collector" }}{{ .Address }}:{{ .Port }}{{ end }}
 EOH
-        destination = "/etc/grafana/provisioning/datasources/datasources.yaml"
-      }
-
-      template {
-        data = <<EOH
-apiVersion: 1
-providers:
-- disableDeletion: false
-  editable: true
-  folder: ""
-  name: default
-  options:
-    path: /var/lib/grafana/dashboards/default
-  orgId: 1
-  type: file
-EOH
-        destination = "/etc/grafana/provisioning/dashboards/dashboardproviders.yaml"
+        // destination = "local/config/provisioning/datasources/datasources.yaml"
+        destination = "local/provisioning/datasources/datasources.yaml"
       }
 
       resources {

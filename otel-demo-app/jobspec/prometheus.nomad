@@ -76,28 +76,28 @@ EOH
         data = <<EOH
 {}
 EOH
-        destination = "/etc/config/recording_rules.yml"
+        destination = "local/config/recording_rules.yml"
       }
 
       template {
         data = <<EOH
 {}
 EOH
-        destination = "/etc/config/rules"
+        destination = "local/config/rules"
       }
 
       template {
         data = <<EOH
 {}
 EOH
-        destination = "/etc/config/alerting_rules.yml"
+        destination = "local/config/alerting_rules.yml"
       }
 
       template {
         data = <<EOH
 {}
 EOH
-        destination = "/etc/config/alerts"
+        destination = "local/config/alerts"
       }
 
       resources {
