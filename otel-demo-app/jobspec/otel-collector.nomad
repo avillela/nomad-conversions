@@ -123,7 +123,7 @@ exporters:
   otlp/ls:
     endpoint: ingest.lightstep.com:443
     headers: 
-      "lightstep-access-token": "{{ with secret "kv/data/otel/o11y/lightstep" }}{{ .Data.data.api_key }}{{ end }}"
+      "lightstep-access-token": "{{ with secret "kv/data/otel/o11y/lightstep" }}{{ .Data.data.ls_token }}{{ end }}"
 
 extensions:
   health_check:
