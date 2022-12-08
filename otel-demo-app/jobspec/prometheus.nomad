@@ -25,6 +25,7 @@ job "prometheus" {
       config {
         // image = "quay.io/prometheus/prometheus:v2.34.0"
         image = "prom/prometheus:v2.38.0"
+        image_pull_timeout = "25m"
         ports = ["prometheus_ui"]
 
         network_mode = "host"
@@ -41,6 +42,13 @@ job "prometheus" {
         volumes = [
           "local/config:/etc/config",
         ]
+      }
+
+      restart {
+        attempts = 10
+        delay    = "15s"
+        interval = "2m"
+        mode     = "delay"
       }
 
       template {

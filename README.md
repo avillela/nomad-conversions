@@ -99,6 +99,7 @@ nomad job stop -purge frontendproxy
 nomad job stop -purge loadgenerator
 nomad job stop -purge grafana
 nomad job stop -purge jaeger
+nomad job stop -purge prometheus
 ```
 
 ## Notes

@@ -44,6 +44,7 @@ job "jaeger" {
 
       config {
         image = "jaegertracing/all-in-one:latest"
+        image_pull_timeout = "25m"
         args = [
             "--memory.max-traces", "10000",
             "--query.base-path", "/jaeger/ui"          
@@ -53,6 +54,13 @@ job "jaeger" {
 
       env {
         COLLECTOR_OTLP_ENABLED = "true"
+      }
+
+      restart {
+        attempts = 10
+        delay    = "15s"
+        interval = "2m"
+        mode     = "delay"
       }
 
       resources {
