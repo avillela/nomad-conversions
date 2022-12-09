@@ -29,7 +29,7 @@ This assumes that you have HashiCorp Nomad, Consul, and Vault running somewhere.
     # For HashiQube
     127.0.0.1   traefik.localhost
     127.0.0.1   frontend.localhost
-    127.0.0.1   frontendproxy.localhost
+    127.0.0.1   otel-demo.localhost
     127.0.0.1   grafana.localhost
     127.0.0.1   jaeger-ui.localhost
     127.0.0.1   prometheus.localhost
@@ -69,11 +69,11 @@ This assumes that you have HashiCorp Nomad, Consul, and Vault running somewhere.
     nomad job run -detach otel-demo-app/jobspec/prometheus.nomad
     ```
 
-    Webstore             `http://frontendproxy.localhost/`
-    Grafana              `http://frontendproxy.localhost/grafana/` or `http://grafana.localhost`
-    Feature Flags UI     `http://frontendproxy.localhost/feature/`
-    Load Generator UI    `http://frontendproxy.localhost/loadgen/`
-    Jaeger UI            `http://frontendproxy.localhost/jaeger/ui/` or `http://jaeger-ui.localhost`
+    Webstore             `http://otel-demo.localhost/`
+    Grafana              `http://otel-demo.localhost/grafana/` or `http://grafana.localhost`
+    Feature Flags UI     `http://otel-demo.localhost/feature/`
+    Load Generator UI    `http://otel-demo.localhost/loadgen/`
+    Jaeger UI            `http://otel-demo.localhost/jaeger/ui/` or `http://jaeger-ui.localhost`
     Prometheus UI         `http://prometheus.localhost`
 
 ### Nuke deployments
