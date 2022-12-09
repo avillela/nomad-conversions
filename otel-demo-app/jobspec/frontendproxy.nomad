@@ -17,7 +17,7 @@ job "frontendproxy" {
     service {
       name = "frontendproxy"
       tags = [
-        "traefik.http.routers.frontendproxy.rule=Host(`frontendproxy.localhost`)",
+        "traefik.http.routers.frontendproxy.rule=Host(`otel-demo.localhost`)",
         "traefik.http.routers.frontendproxy.entrypoints=web",
         "traefik.http.routers.frontendproxy.tls=false",
         "traefik.enable=true",

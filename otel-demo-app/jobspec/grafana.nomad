@@ -105,7 +105,7 @@ plugins = /var/lib/grafana/plugins
 ;provisioning = /etc/grafana/provisioning
 [server]
 protocol = http
-domain = frontendproxy.localhost
+domain = otel-demo.localhost
 http_port = 80
 root_url = %(protocol)s://%(domain)s:%(http_port)s/grafana
 serve_from_sub_path = true
