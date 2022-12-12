@@ -2,7 +2,7 @@ name: opentelemetry-demo
 services:
   adservice:
     build:
-      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo
+      context: ./
       dockerfile: ./src/adservice/Dockerfile
       cache_from:
       - ghcr.io/open-telemetry/demo:v1.1.0-adservice
@@ -35,7 +35,7 @@ services:
     restart: always
   cartservice:
     build:
-      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo
+      context: ./
       dockerfile: ./src/cartservice/src/Dockerfile
       cache_from:
       - ghcr.io/open-telemetry/demo:v1.1.0-cartservice
@@ -70,7 +70,7 @@ services:
     restart: always
   checkoutservice:
     build:
-      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo
+      context: ./
       dockerfile: ./src/checkoutservice/Dockerfile
       cache_from:
       - ghcr.io/open-telemetry/demo:v1.1.0-checkoutservice
@@ -121,7 +121,7 @@ services:
     restart: always
   currencyservice:
     build:
-      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo/src/currencyservice
+      context: .//src/currencyservice
       dockerfile: Dockerfile
       args:
         GRPC_VERSION: 1.46.0
@@ -155,7 +155,7 @@ services:
     restart: always
   emailservice:
     build:
-      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo/src/emailservice
+      context: .//src/emailservice
       dockerfile: Dockerfile
       cache_from:
       - ghcr.io/open-telemetry/demo:v1.1.0-emailservice
@@ -187,7 +187,7 @@ services:
     restart: always
   featureflagservice:
     build:
-      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo
+      context: ./
       dockerfile: ./src/featureflagservice/Dockerfile
       cache_from:
       - ghcr.io/open-telemetry/demo:v1.1.0-featureflagservice
@@ -251,7 +251,7 @@ services:
     restart: always
   frontend:
     build:
-      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo
+      context: ./
       dockerfile: ./src/frontend/Dockerfile
       cache_from:
       - ghcr.io/open-telemetry/demo:v1.1.0-frontend
@@ -310,7 +310,7 @@ services:
     restart: always
   frontendproxy:
     build:
-      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo
+      context: ./
       dockerfile: src/frontendproxy/Dockerfile
     container_name: frontend-proxy
     depends_on:
@@ -364,12 +364,12 @@ services:
       protocol: tcp
     volumes:
     - type: bind
-      source: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo/src/grafana/grafana.ini
+      source: ./src/grafana/grafana.ini
       target: /etc/grafana/grafana.ini
       bind:
         create_host_path: true
     - type: bind
-      source: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo/src/grafana/provisioning
+      source: ./src/grafana/provisioning
       target: /etc/grafana/provisioning
       bind:
         create_host_path: true
@@ -404,7 +404,7 @@ services:
     restart: always
   loadgenerator:
     build:
-      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo
+      context: ./
       dockerfile: ./src/loadgenerator/Dockerfile
       cache_from:
       - ghcr.io/open-telemetry/demo:v1.1.0-loadgenerator
@@ -475,18 +475,18 @@ services:
     restart: always
     volumes:
     - type: bind
-      source: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo/src/otelcollector/otelcol-config.yml
+      source: ./src/otelcollector/otelcol-config.yml
       target: /etc/otelcol-config.yml
       bind:
         create_host_path: true
     - type: bind
-      source: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo/src/otelcollector/otelcol-config-extras.yml
+      source: ./src/otelcollector/otelcol-config-extras.yml
       target: /etc/otelcol-config-extras.yml
       bind:
         create_host_path: true
   paymentservice:
     build:
-      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo
+      context: ./
       dockerfile: ./src/paymentservice/Dockerfile
       cache_from:
       - ghcr.io/open-telemetry/demo:v1.1.0-paymentservice
@@ -519,7 +519,7 @@ services:
     restart: always
   productcatalogservice:
     build:
-      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo
+      context: ./
       dockerfile: ./src/productcatalogservice/Dockerfile
       cache_from:
       - ghcr.io/open-telemetry/demo:v1.1.0-productcatalogservice
@@ -574,13 +574,13 @@ services:
       protocol: tcp
     volumes:
     - type: bind
-      source: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo/src/prometheus/prometheus-config.yaml
+      source: ./src/prometheus/prometheus-config.yaml
       target: /etc/prometheus/prometheus-config.yaml
       bind:
         create_host_path: true
   quoteservice:
     build:
-      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo
+      context: ./
       dockerfile: ./src/quoteservice/Dockerfile
       cache_from:
       - ghcr.io/open-telemetry/demo:v1.1.0-quoteservice
@@ -615,7 +615,7 @@ services:
     restart: always
   recommendationservice:
     build:
-      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo
+      context: ./
       dockerfile: ./src/recommendationservice/Dockerfile
       cache_from:
       - ghcr.io/open-telemetry/demo:v1.1.0-recommendationservice
@@ -676,7 +676,7 @@ services:
     restart: always
   shippingservice:
     build:
-      context: /Users/avillela/Documents/_dev/lightstep/opentelemetry-demo
+      context: ./
       dockerfile: ./src/shippingservice/Dockerfile
       cache_from:
       - ghcr.io/open-telemetry/demo:v1.1.0-shippingservice

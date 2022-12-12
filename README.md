@@ -69,12 +69,12 @@ This assumes that you have HashiCorp Nomad, Consul, and Vault running somewhere.
     nomad job run -detach otel-demo-app/jobspec/prometheus.nomad
     ```
 
-    Webstore             `http://otel-demo.localhost/`
-    Grafana              `http://otel-demo.localhost/grafana/` or `http://grafana.localhost`
-    Feature Flags UI     `http://otel-demo.localhost/feature/`
-    Load Generator UI    `http://otel-demo.localhost/loadgen/`
-    Jaeger UI            `http://otel-demo.localhost/jaeger/ui/` or `http://jaeger-ui.localhost`
-    Prometheus UI         `http://prometheus.localhost`
+    * Webstore             `http://otel-demo.localhost/`
+    * Grafana              `http://otel-demo.localhost/grafana/` or `http://grafana.localhost`
+    * Feature Flags UI     `http://otel-demo.localhost/feature/`
+    * Load Generator UI    `http://otel-demo.localhost/loadgen/`
+    * Jaeger UI            `http://otel-demo.localhost/jaeger/ui/` or `http://jaeger-ui.localhost`
+    * Prometheus UI         `http://prometheus.localhost`
 
 ### Nuke deployments
 
@@ -109,8 +109,8 @@ nomad job stop -purge prometheus
 In order for services to communicate between each other, you need to use Consul templating. For example:
 
 ```hcl
-      template {
-        data = <<EOF
+template {
+  data = <<EOF
 {{ range service "redis-service" }}
 REDIS_ADDR = "{{ .Address }}:{{ .Port }}"
 {{ end }}
@@ -120,9 +120,9 @@ OTEL_EXPORTER_OTLP_ENDPOINT = "http://{{ .Address }}:{{ .Port }}"
 {{ end }}
 
 EOF
-        destination = "local/env"
-        env         = true
-      }
+  destination = "local/env"
+  env         = true
+}
 ```
 
 This pulls the IP and port of a service based on its Consul name, and sets it ato an environment variable.
