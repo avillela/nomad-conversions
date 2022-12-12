@@ -1,3 +1,5 @@
+# This version of the OTel Collector alson includes configs
+# for sending traces to Lightstep
 job "otel-collector" {
   region = "global"
 
@@ -120,6 +122,11 @@ exporters:
     tls:
       insecure: true
 
+  otlp/ls:
+    endpoint: ingest.lightstep.com:443
+    headers: 
+      "lightstep-access-token": "{{ with secret "kv/data/otel/o11y/lightstep" }}{{ .Data.data.ls_token }}{{ end }}"
+
 extensions:
   health_check:
     endpoint: 0.0.0.0:{{ env "NOMAD_PORT_healthcheck" }}
@@ -130,11 +137,11 @@ service:
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [prometheus, logging]
+      exporters: [prometheus, logging, otlp/ls]
     traces:
       receivers: [otlp]
       processors: [spanmetrics, batch]
-      exporters: [logging, otlp]
+      exporters: [logging, otlp, otlp/ls]
 
 EOH
 
