@@ -76,6 +76,33 @@ This assumes that you have HashiCorp Nomad, Consul, and Vault running somewhere.
     * Jaeger UI            `http://otel-demo.localhost/jaeger/ui/` or `http://jaeger-ui.localhost`
     * Prometheus UI         `http://prometheus.localhost`
 
+### Send Traces to Lightstep
+
+By default, the OTel Demo App’s [OpenTelemetry Collector](https://docs.lightstep.com/otel/quick-start-collector) is configured to send Traces and Metrics to [Jaeger](https://jaeger.io), and [Prometheus](https://prometheus.io), respectively. For this demo, I also configured the Collector to send Traces and Metrics to [Lightstep](https://app.lightstep.com).
+
+If you’d like to send Traces and Metrics to Lightstep, you’ll need to do the following:
+
+1. Get a [Lightstep Access Token](https://docs.lightstep.com/docs/create-and-manage-access-tokens#create-an-access-token). (Make sure that you [sign up](https://app.lightstep.com/signup) for a [Lightstep](https://app.lightstep.com) account first, if you don’t already have one.)
+2. Configure Vault by following the instructions [here](https://github.com/avillela/hashiqube#vault-setup).
+3. Add your Lightstep Access Token to Vault by running the command:
+
+  ```
+  vault kv put kv/otel/o11y/lightstep ls_token="<LS_TOKEN>"
+  ```
+
+  Where `<LS_TOKEN>` is your [Lightstep Access Token](https://docs.lightstep.com/docs/create-and-manage-access-tokens#create-an-access-token)
+
+  The OTel Collector job [pulls this value from Vault, into the Collector’s config YAML](https://github.com/avillela/nomad-conversions/blob/cefe9b9b12d84fb47be8aa5fc67b1b221b7b599b/otel-demo-app/jobspec/otel-collector.nomad-with-LS#L125-L128), so that we can also send Traces and Metrics to Lightstep:
+  
+  ```
+  otlp/ls:
+    endpoint: ingest.lightstep.com:443
+    headers: 
+      "lightstep-access-token": "{{ with secret "kv/data/otel/o11y/lightstep" }}{{ .Data.data.ls_token }}{{ end }}"
+  ```
+
+4. Run the version of the OTel Collector jobspec that contains the Lightstep configurations by replacing `nomad job run -detach otel-demo-app/jobspec/otel-collector.nomad` with `nomad job run -detach otel-demo-app/jobspec/otel-collector-with-LS.nomad`
+
 ### Nuke deployments
 
 ```bash
