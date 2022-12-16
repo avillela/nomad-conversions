@@ -19,6 +19,12 @@ job "featureflagservice" {
     service {
       name = "featureflagservice-http"
       port = "http"
+      tags = [
+        "traefik.http.routers.featureflagservice.rule=Host(`feature.localhost`)",
+        "traefik.http.routers.featureflagservice.entrypoints=web",
+        "traefik.http.routers.featureflagservice.tls=false",
+        "traefik.enable=true",
+      ]
 
       check {
         type     = "tcp"
@@ -30,6 +36,12 @@ job "featureflagservice" {
     service {
       name = "featureflagservice-grpc"
       port = "grpc"
+
+      check {
+        type     = "tcp"
+        interval = "10s"
+        timeout  = "5s"
+      }
     }
 
     task "featureflagservice" {
