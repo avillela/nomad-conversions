@@ -37,7 +37,9 @@ job "grafana" {
       port = "http"
 
       check {
-        type     = "tcp"
+        type     = "http"
+        port     = "http"
+        path     = "/api/health"
         interval = "10s"
         timeout  = "5s"
       }

@@ -9,3 +9,5 @@ This is work in progress.
 ## Readmes
 
 * [OTel Demo App on Nomad](docs/otel-demo-app.md)
+* [Temporal on Nomad](docs/temporal.md)
+* [Tracetest on Nomad](docs/tracetest.md)

@@ -5,11 +5,6 @@ job "adservice" {
   group "adservice" {
     count = 1
 
-    // update {
-    //   healthy_deadline  = "20m"
-    //   progress_deadline = "25m"
-    // }
-
     network {
       mode = "host"
 
