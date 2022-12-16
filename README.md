@@ -8,6 +8,6 @@ This is work in progress.
 
 ## Readmes
 
-* [OTel Demo App on Nomad](docs/otel-demo-app.md)
-* [Temporal on Nomad](docs/temporal.md)
-* [Tracetest on Nomad](docs/tracetest.md)
+* [OTel Demo App on Nomad](otel-demo-app/README.md)
+* [Temporal on Nomad](temporal/README.md)
+* [Tracetest on Nomad](tracetest/README.md)
