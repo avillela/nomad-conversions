@@ -143,7 +143,7 @@ service:
     traces:
       receivers: [otlp]
       processors: [tail_sampling, batch]
-      exporters: [logging, otlp, otlp/ls, otlp/tt]
+      exporters: [logging, otlp, otlp/ls]
 
 EOH
 

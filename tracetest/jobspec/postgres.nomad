@@ -23,6 +23,7 @@ job "postgres" {
 
       config {
         image = "docker.io/bitnami/postgresql:14.2.0-debian-10-r45"
+        image_pull_timeout = "25m"
         ports = ["db"]
       }
       env {
@@ -31,7 +32,7 @@ job "postgres" {
           POSTGRESQL_VOLUME_DIR = "/bitnami/postgresql"
           PGDATA = "/bitnami/postgresql/data"
           POSTGRES_USER = "tracetest"
-          POSTGRES_POSTGRES_PASSWORD = "lKcy7eXtHv"
+          POSTGRES_POSTGRES_PASSWORD = "605j3BtwRX"
           POSTGRES_PASSWORD = "not-secure-database-password"
           POSTGRES_DB = "tracetest"
           POSTGRESQL_ENABLE_LDAP = "no"
@@ -48,17 +49,30 @@ job "postgres" {
         memory = 512
       }
 
-    service {
-      tags = [
-        "traefik.http.routers.postgres.rule=Host(`postgres.localhost`)",
-        "traefik.http.routers.postgres.entrypoints=web",
-        "traefik.http.routers.postgres.tls=false",
-        "traefik.enable=true",
-      ]
+      restart {
+        attempts = 10
+        delay    = "15s"
+        interval = "2m"
+        mode     = "delay"
+      }
 
-      port = "db"
+      service {
+        name = "postgres-tracetest"
+        port = "db"
 
-    }
+        check {
+          interval = "10s"
+          timeout  = "5s"
+          type     = "script"
+          command  = "pg_isready"
+          args     = [
+            "-d", "dbname=tracetest",
+            "-h", "${NOMAD_IP_db}",
+            "-p", "${NOMAD_PORT_db}",
+            "-U", "tracetest"
+          ]
+        }
+      }
 
     }
   }

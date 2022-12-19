@@ -5,45 +5,38 @@ job "jaeger" {
     count = 1
 
     network {
-      mode = "bridge"
+      mode = "host"
 
       port "jaeger-ui" {
         to = 16686
       }
       port "jaeger-collector" {
-        to = 14268
+        to = 4317
       }
 
       port "jaeger-proto" {
         to = 14250
       }
 
-      port "jaeger-grpc" {
+      port "jaeger-query" {
         to = 16685
       }
 
     }
 
     service {
-      name = "jaeger-proto"
-      tags = [
-        "traefik.tcp.routers.jaeger-proto.rule=HostSNI(`*`)",
-        "traefik.tcp.routers.jaeger-proto.entrypoints=grpc",
-        "traefik.enable=true",
-      ]        
+      name = "jaeger-collector"
+      port = "jaeger-collector"
+    }
 
+    service {
+      name = "jaeger-proto"
       port = "jaeger-proto"
     }
 
     service {
-      name = "jaeger-grpc"
-      tags = [
-        "traefik.tcp.routers.jaeger-grpc.rule=HostSNI(`*`)",
-        "traefik.tcp.routers.jaeger-grpc.entrypoints=grpc",
-        "traefik.enable=true",
-      ]        
-
-      port = "jaeger-grpc"
+      name = "jaeger-query"
+      port = "jaeger-query"
     }
 
     service {
@@ -63,13 +56,26 @@ job "jaeger" {
       driver = "docker"
 
       config {
-        image = "jaegertracing/all-in-one:1.35.1"
+        // image = "jaegertracing/all-in-one:1.35.1"
         // image = "jaegertracing/all-in-one:1.33"
-        ports = ["jaeger-ui", "jaeger-collector"]
+        image = "jaegertracing/all-in-one:1.40.0"
+        image_pull_timeout = "25m"
+        args = [
+            "--memory.max-traces", "10000",
+            "--query.base-path", "/jaeger/ui"          
+        ]
+        ports = ["jaeger-ui", "jaeger-collector", "jaeger-query", "jaeger-proto"]
       }
 
       env {
         SPAN_STORAGE_TYPE = "memory"
+      }
+
+      restart {
+        attempts = 10
+        delay    = "15s"
+        interval = "2m"
+        mode     = "delay"
       }
 
       resources {

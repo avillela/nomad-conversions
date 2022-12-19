@@ -61,7 +61,8 @@ job "traefik" {
 
       config {
         network_mode = "host"
-        image        = "traefik:v2.6.1"
+        image        = "traefik:v2.8.0-rc1"
+        image_pull_timeout = "25m"
         ports        = ["http", "api", "metrics", "grpc"]
 
         volumes = [
@@ -99,9 +100,16 @@ EOF
         destination = "local/traefik.toml"
       }
 
+      restart {
+        attempts = 10
+        delay    = "15s"
+        interval = "2m"
+        mode     = "delay"
+      }
+
       resources {
-        cpu    = 100
-        memory = 128
+        cpu    = 50
+        memory = 75
       }
     }
   }
