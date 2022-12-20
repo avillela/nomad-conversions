@@ -35,7 +35,7 @@ job "otel-collector" {
         to = 8888
       }
       port "otlp" {
-        to = 4317
+        static = 4317
       }
       port "otlp-http" {
         to = 4318
@@ -125,7 +125,7 @@ exporters:
       "lightstep-access-token": "{{ with secret "kv/data/otel/o11y/lightstep" }}{{ .Data.data.ls_token }}{{ end }}"
 
   otlp/tt:
-    endpoint: '{{ range service "tracetest-grpc" }}{{ .Address }}:{{ .Port }}{{ end }}'
+    endpoint: 'tracetest-grpc.service.consul:21321'
     tls:
       insecure: true
 

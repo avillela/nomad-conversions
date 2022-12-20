@@ -13,7 +13,7 @@ job "tracetest" {
       }
 
       port "tracetest-grpc" {
-        to = 21321
+        static = 21321
       }
 
     }
@@ -104,7 +104,7 @@ telemetry:
       exporter:
         type: collector
         collector:
-          endpoint: {{ range service "otelcol-grpc" }}{{ .Address }}:{{ .Port }}{{ end }}
+          endpoint: otelcol-grpc.service.consul:4317
 
 server:
   telemetry:
@@ -114,7 +114,7 @@ server:
 EOF
 
         // Use noop for now because of chicken-and-egg situation with tracetest and OTel Collector
-        change_mode = "noop"
+        // change_mode = "noop"
         // change_mode   = "signal"
         // change_signal = "SIGHUP"
         destination = "/local/config.yaml"

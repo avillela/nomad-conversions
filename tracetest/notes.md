@@ -13,7 +13,7 @@ nomad job run -detach jobspec/traefik.nomad
 nomad job run -detach jobspec/jaeger.nomad
 nomad job run -detach jobspec/postgres.nomad
 nomad job run -detach jobspec/tracetest.nomad
-nomad job run -detach jobspec/otel-collector-no-tracetest.nomad
+nomad job run -detach jobspec/otel-collector.nomad
 ```
 
 Once everything is up and running, run the version of the [OTel Collector jobspec](otel-collector.nomad) that has Tracetest as part of the trace pipeline:
