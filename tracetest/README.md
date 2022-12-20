@@ -34,75 +34,26 @@ This conversion was started by using the Tracetest Helm chart output to create t
 
     ```text
     192.168.56.192  tracetest.localhost
-    192.168.56.192  postgres.localhost
     192.168.56.192  jaeger-ui.localhost
-    192.168.56.192  jaeger-grpc.localhost
-    192.168.56.192  jaeger-proto.localhost
     192.168.56.192  go-server.localhost
     ```
 
-    This will allow Nomad on HashiQube to access the various services required for Tracetest.
+    This will allow you to access various UIs for this example.
 
 3. Deploy to Nomad
 
-    Please ensure that you deploy the jobspecs in this order:
-
     ```bash
-    # Traefik with HTTP and gRPC enabled
-    nomad job run jobspec/traefik.nomad
-
-    # PostgreSQL DB required by Tracetest
-    nomad job run jobspec/postgres.nomad
-
-    # Jaeger tracing backend, supported by Tracetest
-    nomad job run jobspec/jaeger.nomad
-
-    # Go server app
-    nomad job run jobspec/go-server.nomad
-
-    # OTel Collector
-    nomad job run jobspec/otel-collector.nomad
-
-    # Tracetest
-    nomad job run jobspec/tracetest.nomad
+    nomad job run -detach tracetest/jobspec/traefik.nomad
+    nomad job run -detach tracetest/jobspec/jaeger.nomad
+    nomad job run -detach tracetest/jobspec/postgres.nomad
+    nomad job run -detach tracetest/jobspec/tracetest.nomad
+    nomad job run -detach tracetest/jobspec/otel-collector.nomad
     ```
 
-4. Check the PostgreSQL connection
+4. Access the Tracetest and Jaeger UIs
 
-    To check the PostgreSQL connection, we need to install the `pg_isready` utility, which is available when you install PostgreSQL. See reference [here](https://stackoverflow.com/a/46703723).
-
-    ```bash
-    brew install postgres
-    brew tap homebrew/services
-
-    # Check that postgres isn't running, since we don't want it running locally
-    brew services list
-    ```
-
-    >**NOTE:** This downloads and installs PostgreSQL on your Mac, but doesn't run the service. We just want to use the `pg_isready` util to make sure that we can connect to our DB.
-
-    Now we can test our connection. More info [here](https://stackoverflow.com/a/44496546).
-
-    ```bash
-    pg_isready -d tracetest -h postgres.localhost -p 5432 -U tracetest
-    ```
-
-5. Make sure that the Jaeger query service is up and running
-
-    Check gRPC endpoint (used by Tracetest)
-
-    ```bash
-    brew install grpcurl
-    grpcurl --plaintext jaeger-grpc.localhost:7233 list
-    ```
-
-    >**NOTE:** We exposed port `7233` in Traefik, which maps to Jaeger gRPC container port `16685`.
-
-    The Jaeger UI can accessed here: `http://jaeger-ui.localhost`
-
-6. Make sure that Tracetest is up and running
-
-    Go to the Tracetest UI here: `http://tracetest.localhost`
+    * Tracetest: `http://tracetest.localhost`
+    * Jaeger: `http://jaeger-ui.localhost`
 
 7. Access the sample app
 

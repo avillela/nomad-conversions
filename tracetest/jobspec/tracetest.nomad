@@ -41,12 +41,6 @@ job "tracetest" {
     service {
       name = "tracetest-grpc"
       port = "tracetest-grpc"
-      tags = [
-        "traefik.tcp.routers.tracetest-grpc.rule=HostSNI(`*`)",
-        "traefik.tcp.routers.tracetest-grpc.entrypoints=grpc",
-        "traefik.enable=true",
-      ]        
-
 
       check {
         type     = "tcp"
@@ -112,11 +106,7 @@ server:
     exporter: collector
     applicationExporter: collector
 EOF
-
-        // Use noop for now because of chicken-and-egg situation with tracetest and OTel Collector
-        // change_mode = "noop"
-        // change_mode   = "signal"
-        // change_signal = "SIGHUP"
+        change_mode   = "restart"
         destination = "/local/config.yaml"
       }
     }
