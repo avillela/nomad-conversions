@@ -156,7 +156,11 @@ service:
     traces:
       receivers: [otlp]
       processors: [spanmetrics, batch]
-      exporters: [logging, otlp, otlp/ls]
+      exporters: [logging, otlp, otlp/ls, otlp/tt]
+    traces/tt:
+      receivers: [otlp]
+      processors: [tail_sampling, batch]
+      exporters: [logging, otlp/tt]
 
 EOH
 
