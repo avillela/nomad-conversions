@@ -6,7 +6,11 @@
 
 This conversion was started by using the Tracetest Helm chart output to create the Tracetest jobspecs.
 
-1. Render helm charts:
+For details on how to convert Kubernetes manifests to Nomad Jobspecs, check out my blog post [here](https://medium.com/dev-genius/how-to-convert-kubernetes-manifests-into-nomad-jobspecs-7a58d2fa07a0).
+
+Some additional info:
+
+* Rendering the Tracetest Helm charts to Kubernetes YAML manifests:
 
     ```bash
     helm repo add kubeshop https://kubeshop.github.io/helm-charts
@@ -14,7 +18,7 @@ This conversion was started by using the Tracetest Helm chart output to create t
     helm template tracetest kubeshop/tracetest > tracetest.yaml
     ```
 
-2. Base64 decode k8s secrets
+* Base64 decode k8s secrets
 
     I do this so that I can find out the credentials to pass to Postgres when defining the `postgres.nomad` job. Right now, they're hard-coded. You will want to use Vault to store these credentials in a real-life scenario.
 
