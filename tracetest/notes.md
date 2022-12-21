@@ -14,6 +14,7 @@ nomad job run -detach jobspec/jaeger.nomad
 nomad job run -detach jobspec/postgres.nomad
 nomad job run -detach jobspec/tracetest.nomad
 nomad job run -detach jobspec/otel-collector.nomad
+nomad job run -detach jobspec/go-server.nomad
 ```
 
 Once everything is up and running, run the version of the [OTel Collector jobspec](otel-collector.nomad) that has Tracetest as part of the trace pipeline:
@@ -31,4 +32,5 @@ nomad job stop -purge jaeger
 nomad job stop -purge postgres
 nomad job stop -purge tracetest
 nomad job stop -purge otel-collector
+nomad job stop -purge go-server
 ```

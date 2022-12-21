@@ -35,7 +35,7 @@ job "otel-collector" {
         to = 8888
       }
       port "otlp" {
-        to = 4317
+        static = 4317
       }
       port "otlp-http" {
         to = 4318
@@ -128,7 +128,7 @@ exporters:
     endpoint: "0.0.0.0:{{ env "NOMAD_PORT_prometheus" }}"
 
   otlp:
-    endpoint: '{{ range service "jaeger-collector" }}{{ .Address }}:{{ .Port }}{{ end }}'
+    endpoint: '{{ range service "jaeger-proto" }}{{ .Address }}:{{ .Port }}{{ end }}'
     tls:
       insecure: true
 

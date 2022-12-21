@@ -38,6 +38,16 @@ job "go-server" {
         ]
       }
 
+      template {
+        data = <<EOF
+{{ range service "otelcol-http" }}
+COLLECTOR_ENDPOINT = "{{ .Address }}:{{ .Port }}"
+{{ end }}
+EOF
+        destination = "local/env"
+        env         = true
+      }
+
       resources {
         cpu    = 100
         memory = 512

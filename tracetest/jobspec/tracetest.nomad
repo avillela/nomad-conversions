@@ -106,7 +106,7 @@ server:
     exporter: collector
     applicationExporter: collector
 EOF
-        change_mode   = "restart"
+        // change_mode   = "restart"
         destination = "/local/config.yaml"
       }
     }
