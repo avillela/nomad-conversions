@@ -2,6 +2,8 @@
 
 Please note that at the time of this writing, all Metrics and Traces are being sent to [Lightstep](https://app.lightstep.com). Learn more about how to configure the OTel Collector on Nomad to send OTel data to Lightstep [here](https://medium.com/tucows/just-in-time-nomad-running-the-opentelemetry-collector-on-hashicorp-nomad-with-hashiqube-4eaf009b8382).
 
+For details on how to convert Kubernetes manifests to Nomad Jobspecs, check out my blog post [here](https://medium.com/dev-genius/how-to-convert-kubernetes-manifests-into-nomad-jobspecs-7a58d2fa07a0).
+
 ## Gotchas
 
 * If you are using HashiQube, make sure that you allocate enough memory to Docker. I usually allocate 5 CPUs and 12GB RAM
