@@ -14,7 +14,9 @@ This conversion was started by using the Tracetest Helm chart output to create t
     helm template tracetest kubeshop/tracetest > tracetest.yaml
     ```
 
-2. Base64 decode k8s secrets:
+2. Base64 decode k8s secrets
+
+    I do this so that I can find out the credentials to pass to Postgres when defining the `postgres.nomad` job. Right now, they're hard-coded. You will want to use Vault to store these credentials in a real-life scenario.
 
     ```bash
     # postgrest-password
@@ -26,9 +28,28 @@ This conversion was started by using the Tracetest Helm chart output to create t
 
 ## Deploying Tracetest on Nomad
 
+Please note that this example sends traces to both Lightstep and Jaeger. In order to send traces to Lightstep, you will need:
+
+* A Lightstep Account. You can create a free account [here](https://app.lightstep.com/signup/developer?signup_source=docs)
+* A [Lightstep Access Token](https://docs.lightstep.com/docs/create-and-manage-access-tokens)
+
+> **NOTE:** Jaeger is currently disabled from the OTel pipeline (need to fix a connectivity bug). We are sending traces to Lightstep only.
+
 1. Start up [HashiQube](https://rubiksqube.com/#/) per the instuctions [here](https://github.com/avillela/hashiqube)
 
-2. Update `/etc/hosts`
+2. Set up Vault
+
+    Follow the instructions [here](https://github.com/avillela/hashiqube#vault-setup). You will need this to add your Lightstep Access Token to Vault, so that you can send traces to Lightstep.
+
+3. Add your Lightstep Access Token to Vault
+
+    ```bash
+    vault kv put kv/otel/o11y/lightstep ls_token="<LS_TOKEN>"
+    ```
+
+    Where `<LS_TOKEN>` is your [Lightstep Access Token](https://docs.lightstep.com/docs/create-and-manage-access-tokens)
+
+4. Update `/etc/hosts`
 
     Add the following entries:
 
@@ -38,11 +59,12 @@ This conversion was started by using the Tracetest Helm chart output to create t
     127.0.0.1  go-server.localhost
     ```
 
-    This will allow you to access various UIs for this example.
+    This will enable you to access various endpoints in this example.
 
-3. Deploy to Nomad
+5. Deploy to Nomad
 
     ```bash
+    cd tracetest
     nomad job run -detach jobspec/traefik.nomad
     nomad job run -detach jobspec/jaeger.nomad
     nomad job run -detach jobspec/postgres.nomad
@@ -51,19 +73,35 @@ This conversion was started by using the Tracetest Helm chart output to create t
     nomad job run -detach jobspec/go-server.nomad
     ```
 
-4. Access the Tracetest and Jaeger UIs
+6. Access the Tracetest and Jaeger UIs
 
     * Tracetest: `http://tracetest.localhost`
     * Jaeger: `http://jaeger-ui.localhost`
 
-    > **NOTE:** Jaeger is currently disabled. We are sending traces to Lightstep only.
+## Tracetest setup
 
-5. Create test in Tracetest
+Now that you've installed Tracetest, let's configure and run a test.
 
-    Create a test from the following CURL command:
+1. Configure Tracetest
+    
+    ```bash
+    tracetest configure --endpoint http://tracetest.localhost --analytics=false
+    ```
+
+    This creates a `config.yml` file in the folder from which you run the `tracetest configure` command.
+
+    > **NOTE:** There's already a `config.yml` file in this repo, so running the above command will overwrite it.
+
+2. Run the sample test
 
     ```bash
-    curl http://go-server-svc.service.consul:9000
+    tracetest test run --definition tests/go-server-test.yml
+    ```
+
+    Sample output:
+
+    ```bash
+    ✔ Go Server Example (http://tracetest.localhost/test/QUQB0jc4g/run/1/test)
     ```
 
 ## Nukify Jobs

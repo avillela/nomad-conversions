@@ -2,7 +2,7 @@ job "go-server" {
 
   datacenters = ["dc1"]
 
-  group "svc" {
+  group "go-server" {
     count = 1
 
 
@@ -16,6 +16,7 @@ job "go-server" {
     }
 
     service {
+      name = "go-server"
       tags = [
         "traefik.http.routers.go-server.rule=Host(`go-server.localhost`)",
         "traefik.http.routers.go-server.entrypoints=web",
@@ -27,7 +28,7 @@ job "go-server" {
 
     }
 
-    task "svc" {
+    task "go-server" {
       driver = "docker"
       
       config {

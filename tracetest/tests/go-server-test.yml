@@ -1,0 +1,14 @@
+type: Test
+spec:
+  name: Go Server Example
+  description: Go Server Example
+  trigger:
+    type: http
+    httpRequest:
+      url: http://go-server.service.consul:9000
+      method: GET
+  specs:
+  - selector: span[tracetest.span.type="general" name="signing up"]
+    assertions:
+    - attr:name = "signing up"
+    - attr:registrant.name = "Kathryn Janeway"
