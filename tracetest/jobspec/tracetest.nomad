@@ -81,7 +81,7 @@ job "tracetest" {
 postgresConnString: "host={{ range service "postgres-tracetest" }}{{ .Address }}{{ end }} user=tracetest password=not-secure-database-password  port={{ range service "postgres-tracetest" }}{{ .Port }}{{ end }} sslmode=disable"
 
 poolingConfig:
-  maxWaitTimeForTrace: 10s
+  maxWaitTimeForTrace: 15s
   retryDelay: 1s
 
 googleAnalytics:

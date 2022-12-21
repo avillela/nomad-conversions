@@ -34,3 +34,8 @@ nomad job stop -purge tracetest
 nomad job stop -purge otel-collector
 nomad job stop -purge go-server
 ```
+
+## Notes
+
+* When setting up tracetest test, reference internal HashiQube IP (need to change this to use Consul + static port)
+* `go-server.nomad` needs to start after all the other stuff deploys (though once I change to Consul DNS + static port, should be okayin )
