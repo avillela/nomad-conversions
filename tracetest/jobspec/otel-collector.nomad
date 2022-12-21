@@ -38,7 +38,7 @@ job "otel-collector" {
         static = 4317
       }
       port "otlp-http" {
-        to = 4318
+        static = 4318
       }
       port "prometheus" {
         to = 9464
@@ -156,7 +156,7 @@ service:
     traces:
       receivers: [otlp]
       processors: [spanmetrics, batch]
-      exporters: [logging, otlp, otlp/ls]
+      exporters: [logging, otlp/ls]
     traces/tt:
       receivers: [otlp]
       processors: [tail_sampling, batch]

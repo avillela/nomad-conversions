@@ -10,6 +10,7 @@ job "go-server" {
 
       port "app-port" {
         to = 9000
+        static = 9000
       }
 
     }
@@ -38,14 +39,8 @@ job "go-server" {
         ]
       }
 
-      template {
-        data = <<EOF
-{{ range service "otelcol-http" }}
-COLLECTOR_ENDPOINT = "{{ .Address }}:{{ .Port }}"
-{{ end }}
-EOF
-        destination = "local/env"
-        env         = true
+      env {
+        COLLECTOR_ENDPOINT = "otelcol-http.service.consul:4318"
       }
 
       resources {
