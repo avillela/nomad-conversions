@@ -44,9 +44,16 @@ job "go-server" {
         COLLECTOR_ENDPOINT = "otelcol-http.service.consul:4318"
       }
 
+      restart {
+        attempts = 10
+        delay    = "15s"
+        interval = "2m"
+        mode     = "delay"
+      }
+
       resources {
-        cpu    = 100
-        memory = 512
+        cpu    = 40
+        memory = 150
       }
 
     }

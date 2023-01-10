@@ -72,8 +72,8 @@ job "tracetest" {
       }
 
       resources {
-        cpu    = 100
-        memory = 512
+        cpu    = 50
+        memory = 100
       }
 
       template {

@@ -123,6 +123,99 @@ nomad job stop -purge jaeger
 nomad job stop -purge prometheus
 ```
 
+## Running Tracetest for OTel Demo App
+
+1. Deploy
+
+  ```bash
+      nomad operator scheduler set-config -memory-oversubscription true
+
+      nomad job run -detach tracetest/jobspec/traefik.nomad
+      nomad job run -detach tracetest/jobspec/postgres.nomad
+      nomad job run -detach tracetest/jobspec/tracetest.nomad
+      nomad job run -detach tracetest/jobspec/otel-collector.nomad
+      nomad job run -detach tracetest/jobspec/go-server.nomad
+      nomad job run -detach otel-demo-app/jobspec/redis.nomad
+      nomad job run -detach otel-demo-app/jobspec/ffspostgres.nomad
+
+      nomad job run -detach otel-demo-app/jobspec/adservice.nomad
+      nomad job run -detach otel-demo-app/jobspec/cartservice.nomad
+      nomad job run -detach otel-demo-app/jobspec/currencyservice.nomad
+      nomad job run -detach otel-demo-app/jobspec/emailservice.nomad
+      nomad job run -detach otel-demo-app/jobspec/featureflagservice.nomad
+      nomad job run -detach otel-demo-app/jobspec/paymentservice.nomad
+      nomad job run -detach otel-demo-app/jobspec/productcatalogservice.nomad
+      nomad job run -detach otel-demo-app/jobspec/quoteservice.nomad
+      nomad job run -detach otel-demo-app/jobspec/shippingservice.nomad
+      nomad job run -detach otel-demo-app/jobspec/checkoutservice.nomad
+      nomad job run -detach otel-demo-app/jobspec/recommendationservice.nomad
+      nomad job run -detach otel-demo-app/jobspec/frontend.nomad
+      nomad job run -detach otel-demo-app/jobspec/loadgenerator.nomad
+      nomad job run -detach otel-demo-app/jobspec/frontendproxy.nomad
+      nomad job run -detach otel-demo-app/jobspec/grafana.nomad
+      nomad job run -detach otel-demo-app/jobspec/jaeger.nomad
+      nomad job run -detach otel-demo-app/jobspec/prometheus.nomad
+  ```
+
+2. Run tests
+
+  Cart Service test
+
+  ```bash
+  tracetest test run --definition tracetest/tests/cart-service-test.yml
+  ```
+
+  Sample output:
+
+  ```bash
+  ✔ CartService gRPC Test (http://tracetest.localhost/test/avtest123/run/3/test)
+  ```
+
+
+  Recommendation Service test
+
+  ```bash
+  tracetest test run --definition tracetest/tests/recommendation-service-test.yml
+  ```
+
+  Sample output:
+
+  ```bash
+  ✔ RecommendationService test (http://tracetest.localhost/test/avtest456/run/4/test)
+  ```
+
+  Note that in order to get these to run, I had to set static ports for both [`recommendationservice.nomad`](recommendationservice.nomad) and [`cartservice.nomad`](cartservice.nomad).
+
+3. Nukify
+
+  ```bash
+  nomad job stop -purge traefik
+  nomad job stop -purge postgres
+  nomad job stop -purge tracetest
+  nomad job stop -purge otel-collector
+  nomad job stop -purge go-server
+  nomad job stop -purge redis
+  nomad job stop -purge ffspostgres
+
+  nomad job stop -purge adservice
+  nomad job stop -purge cartservice
+  nomad job stop -purge currencyservice
+  nomad job stop -purge emailservice
+  nomad job stop -purge featureflagservice
+  nomad job stop -purge paymentservice
+  nomad job stop -purge productcatalogservice
+  nomad job stop -purge quoteservice
+  nomad job stop -purge shippingservice
+  nomad job stop -purge checkoutservice
+  nomad job stop -purge recommendationservice
+  nomad job stop -purge frontend
+  nomad job stop -purge loadgenerator
+  nomad job stop -purge frontendproxy
+  nomad job stop -purge grafana
+  nomad job stop -purge jaeger
+  nomad job stop -purge prometheus  
+  ```
+
 ## Notes
 
 ### Communication Between Services

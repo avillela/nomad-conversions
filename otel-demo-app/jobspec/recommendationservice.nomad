@@ -15,6 +15,7 @@ job "recommendationservice" {
 
       port "containerport" {
         to = 9001
+        static = 9001
       }
     }
 

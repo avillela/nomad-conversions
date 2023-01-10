@@ -14,7 +14,7 @@ job "postgres" {
     network {
       
       port "db" {
-        static = 5432
+        static = 5433
       }
     }
 
@@ -45,8 +45,8 @@ job "postgres" {
       }
 
       resources {
-        cpu    = 200
-        memory = 512
+        cpu    = 50
+        memory = 250
       }
 
       restart {
