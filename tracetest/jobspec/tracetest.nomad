@@ -54,7 +54,7 @@ job "tracetest" {
       driver = "docker"
 
       config {
-        image = "kubeshop/tracetest:v0.8.2"
+        image = "kubeshop/tracetest:v0.9.1"
         image_pull_timeout = "25m"
         args = [
           "-config", 
@@ -85,7 +85,7 @@ poolingConfig:
   retryDelay: 1s
 
 googleAnalytics:
-  enabled: true
+  enabled: false
 
 telemetry:
   dataStores:
