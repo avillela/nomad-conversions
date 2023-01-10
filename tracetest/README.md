@@ -23,7 +23,7 @@ Some additional info:
     I do this so that I can find out the credentials to pass to Postgres when defining the `postgres.nomad` job. Right now, they're hard-coded. You will want to use Vault to store these credentials in a real-life scenario.
 
     ```bash
-    # postgrest-password
+    # postgres password
     echo bEtjeTdlWHRIdg== | base64 -d
 
     # password
