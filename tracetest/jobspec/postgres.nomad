@@ -14,7 +14,7 @@ job "postgres" {
     network {
       
       port "db" {
-        static = 5432
+        static = 5433
       }
     }
 
@@ -22,17 +22,17 @@ job "postgres" {
       driver = "docker"
 
       config {
-        image = "docker.io/bitnami/postgresql:14.2.0-debian-10-r45"
+        image = "docker.io/bitnami/postgresql:14.6.0-debian-11-r13"
         image_pull_timeout = "25m"
         ports = ["db"]
       }
       env {
           BITNAMI_DEBUG = "false"
-          POSTGRESQL_PORT_NUMBER = "5432"
+          POSTGRESQL_PORT_NUMBER = "${NOMAD_PORT_db}"
           POSTGRESQL_VOLUME_DIR = "/bitnami/postgresql"
           PGDATA = "/bitnami/postgresql/data"
           POSTGRES_USER = "tracetest"
-          POSTGRES_POSTGRES_PASSWORD = "605j3BtwRX"
+          POSTGRES_POSTGRES_PASSWORD = "gQmBTFiUBv"
           POSTGRES_PASSWORD = "not-secure-database-password"
           POSTGRES_DB = "tracetest"
           POSTGRESQL_ENABLE_LDAP = "no"
@@ -45,8 +45,8 @@ job "postgres" {
       }
 
       resources {
-        cpu    = 200
-        memory = 512
+        cpu    = 50
+        memory = 250
       }
 
       restart {

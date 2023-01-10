@@ -4,15 +4,15 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: tracetest-postgresql
-  namespace: default
+  namespace: "default"
   labels:
     app.kubernetes.io/name: postgresql
-    helm.sh/chart: postgresql-11.1.12
+    helm.sh/chart: postgresql-12.1.6
     app.kubernetes.io/instance: tracetest
     app.kubernetes.io/managed-by: Helm
 type: Opaque
 data:
-  postgres-password: "NjA1ajNCdHdSWA=="
+  postgres-password: "Z1FtQlRGaVVCdg=="
   password: "bm90LXNlY3VyZS1kYXRhYmFzZS1wYXNzd29yZA=="
   # We don't auto-generate LDAP password when it's not provided as we do for other passwords
 ---
@@ -22,10 +22,10 @@ kind: ConfigMap
 metadata:
   name: tracetest
   labels:
-    helm.sh/chart: tracetest-0.2.26
+    helm.sh/chart: tracetest-0.2.30
     app.kubernetes.io/name: tracetest
     app.kubernetes.io/instance: tracetest
-    app.kubernetes.io/version: "v0.8.2"
+    app.kubernetes.io/version: "v0.9.1"
     app.kubernetes.io/managed-by: Helm
 data:
   config.yaml: |-
@@ -69,10 +69,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: tracetest-postgresql-hl
-  namespace: default
+  namespace: "default"
   labels:
     app.kubernetes.io/name: postgresql
-    helm.sh/chart: postgresql-11.1.12
+    helm.sh/chart: postgresql-12.1.6
     app.kubernetes.io/instance: tracetest
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: primary
@@ -102,16 +102,17 @@ apiVersion: v1
 kind: Service
 metadata:
   name: tracetest-postgresql
-  namespace: default
+  namespace: "default"
   labels:
     app.kubernetes.io/name: postgresql
-    helm.sh/chart: postgresql-11.1.12
+    helm.sh/chart: postgresql-12.1.6
     app.kubernetes.io/instance: tracetest
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: primary
   annotations:
 spec:
   type: ClusterIP
+  sessionAffinity: None
   ports:
     - name: tcp-postgresql
       port: 5432
@@ -128,10 +129,10 @@ kind: Service
 metadata:
   name: tracetest
   labels:
-    helm.sh/chart: tracetest-0.2.26
+    helm.sh/chart: tracetest-0.2.30
     app.kubernetes.io/name: tracetest
     app.kubernetes.io/instance: tracetest
-    app.kubernetes.io/version: "v0.8.2"
+    app.kubernetes.io/version: "v0.9.1"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -140,6 +141,10 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+    - port: 21321
+      targetPort: otlp
+      protocol: TCP
+      name: otlp
   selector:
     app.kubernetes.io/name: tracetest
     app.kubernetes.io/instance: tracetest
@@ -150,10 +155,10 @@ kind: Deployment
 metadata:
   name: tracetest
   labels:
-    helm.sh/chart: tracetest-0.2.26
+    helm.sh/chart: tracetest-0.2.30
     app.kubernetes.io/name: tracetest
     app.kubernetes.io/instance: tracetest
-    app.kubernetes.io/version: "v0.8.2"
+    app.kubernetes.io/version: "v0.9.1"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -174,7 +179,7 @@ spec:
         - name: tracetest
           securityContext:
             {}
-          image: "kubeshop/tracetest:v0.8.2"
+          image: "kubeshop/tracetest:v0.9.1"
           args:
           - -config
           - '/app/config/config.yaml'
@@ -182,6 +187,9 @@ spec:
           ports:
             - name: http
               containerPort: 11633
+              protocol: TCP
+            - name: otlp
+              containerPort: 21321
               protocol: TCP
           livenessProbe:
             httpGet:
@@ -206,10 +214,10 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: tracetest-postgresql
-  namespace: default
+  namespace: "default"
   labels:
     app.kubernetes.io/name: postgresql
-    helm.sh/chart: postgresql-11.1.12
+    helm.sh/chart: postgresql-12.1.6
     app.kubernetes.io/instance: tracetest
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: primary
@@ -230,7 +238,7 @@ spec:
       name: tracetest-postgresql
       labels:
         app.kubernetes.io/name: postgresql
-        helm.sh/chart: postgresql-11.1.12
+        helm.sh/chart: postgresql-12.1.6
         app.kubernetes.io/instance: tracetest
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: primary
@@ -249,8 +257,6 @@ spec:
                     app.kubernetes.io/name: postgresql
                     app.kubernetes.io/instance: tracetest
                     app.kubernetes.io/component: primary
-                namespaces:
-                  - "default"
                 topologyKey: kubernetes.io/hostname
               weight: 1
         nodeAffinity:
@@ -262,7 +268,7 @@ spec:
       initContainers:
       containers:
         - name: postgresql
-          image: docker.io/bitnami/postgresql:14.2.0-debian-10-r45
+          image: docker.io/bitnami/postgresql:14.6.0-debian-11-r13
           imagePullPolicy: "IfNotPresent"
           securityContext:
             runAsUser: 1001
@@ -372,10 +378,10 @@ kind: Pod
 metadata:
   name: "tracetest-test-connection"
   labels:
-    helm.sh/chart: tracetest-0.2.26
+    helm.sh/chart: tracetest-0.2.30
     app.kubernetes.io/name: tracetest
     app.kubernetes.io/instance: tracetest
-    app.kubernetes.io/version: "v0.8.2"
+    app.kubernetes.io/version: "v0.9.1"
     app.kubernetes.io/managed-by: Helm
   annotations:
     "helm.sh/hook": test

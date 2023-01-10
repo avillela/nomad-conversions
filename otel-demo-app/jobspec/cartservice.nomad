@@ -10,6 +10,7 @@ job "cartservice" {
 
       port "containerport" {
         to = 7070
+        static = 7070
       }
     }
 
