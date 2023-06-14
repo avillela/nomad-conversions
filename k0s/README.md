@@ -18,8 +18,12 @@ docker exec k0s kubectl get svc
 docker exec k0s cat /var/lib/k0s/pki/admin.conf
 ```
 
-## Scratchpad
+## Run k0s in Nomad
 
 ```bash
-ls -al /var/lib/k0s/bin/etcd && chmod 777 /var/lib/k0s/bin/etcd && ls -al /var/lib/k0s/bin/etcd
+export ALLOCATION_ID=$(nomad job allocs -json k0s | jq -r '.[0].ID')
+nomad alloc exec $ALLOCATION_ID kubectl get ns
+
+# To add to kubectl
+nomad alloc exec $ALLOCATION_ID cat /var/lib/k0s/pki/admin.conf
 ```
