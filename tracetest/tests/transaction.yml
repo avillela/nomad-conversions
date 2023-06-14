@@ -1,0 +1,8 @@
+type: Transaction
+spec:
+  id: tEzNfa24g
+  name: transaction_test
+  description: transaction_test
+  steps:
+  - avtest456
+  - avtest123

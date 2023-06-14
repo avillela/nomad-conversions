@@ -1,0 +1,10 @@
+type: Environment
+spec:
+  id: test-env
+  name: Test Env
+  description: my test env
+  values:
+  - key: rec.svc.host
+    value: recommendationservice.service.consul
+  - key: rec.svc.port
+    value: "9001"

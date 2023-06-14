@@ -128,33 +128,33 @@ nomad job stop -purge prometheus
 1. Deploy
 
   ```bash
-      nomad operator scheduler set-config -memory-oversubscription true
+  nomad operator scheduler set-config -memory-oversubscription true
 
-      nomad job run -detach tracetest/jobspec/traefik.nomad
-      nomad job run -detach tracetest/jobspec/postgres.nomad
-      nomad job run -detach tracetest/jobspec/tracetest.nomad
-      nomad job run -detach tracetest/jobspec/otel-collector.nomad
-      nomad job run -detach tracetest/jobspec/go-server.nomad
-      nomad job run -detach otel-demo-app/jobspec/redis.nomad
-      nomad job run -detach otel-demo-app/jobspec/ffspostgres.nomad
+  nomad job run -detach tracetest/jobspec/traefik.nomad
+  nomad job run -detach tracetest/jobspec/postgres.nomad
+  nomad job run -detach tracetest/jobspec/tracetest.nomad
+  nomad job run -detach tracetest/jobspec/otel-collector.nomad
+  nomad job run -detach tracetest/jobspec/go-server.nomad
+  nomad job run -detach otel-demo-app/jobspec/redis.nomad
+  nomad job run -detach otel-demo-app/jobspec/ffspostgres.nomad
 
-      nomad job run -detach otel-demo-app/jobspec/adservice.nomad
-      nomad job run -detach otel-demo-app/jobspec/cartservice.nomad
-      nomad job run -detach otel-demo-app/jobspec/currencyservice.nomad
-      nomad job run -detach otel-demo-app/jobspec/emailservice.nomad
-      nomad job run -detach otel-demo-app/jobspec/featureflagservice.nomad
-      nomad job run -detach otel-demo-app/jobspec/paymentservice.nomad
-      nomad job run -detach otel-demo-app/jobspec/productcatalogservice.nomad
-      nomad job run -detach otel-demo-app/jobspec/quoteservice.nomad
-      nomad job run -detach otel-demo-app/jobspec/shippingservice.nomad
-      nomad job run -detach otel-demo-app/jobspec/checkoutservice.nomad
-      nomad job run -detach otel-demo-app/jobspec/recommendationservice.nomad
-      nomad job run -detach otel-demo-app/jobspec/frontend.nomad
-      nomad job run -detach otel-demo-app/jobspec/loadgenerator.nomad
-      nomad job run -detach otel-demo-app/jobspec/frontendproxy.nomad
-      nomad job run -detach otel-demo-app/jobspec/grafana.nomad
-      nomad job run -detach otel-demo-app/jobspec/jaeger.nomad
-      nomad job run -detach otel-demo-app/jobspec/prometheus.nomad
+  nomad job run -detach otel-demo-app/jobspec/adservice.nomad
+  nomad job run -detach otel-demo-app/jobspec/cartservice.nomad
+  nomad job run -detach otel-demo-app/jobspec/currencyservice.nomad
+  nomad job run -detach otel-demo-app/jobspec/emailservice.nomad
+  nomad job run -detach otel-demo-app/jobspec/featureflagservice.nomad
+  nomad job run -detach otel-demo-app/jobspec/paymentservice.nomad
+  nomad job run -detach otel-demo-app/jobspec/productcatalogservice.nomad
+  nomad job run -detach otel-demo-app/jobspec/quoteservice.nomad
+  nomad job run -detach otel-demo-app/jobspec/shippingservice.nomad
+  nomad job run -detach otel-demo-app/jobspec/checkoutservice.nomad
+  nomad job run -detach otel-demo-app/jobspec/recommendationservice.nomad
+  nomad job run -detach otel-demo-app/jobspec/frontend.nomad
+  nomad job run -detach otel-demo-app/jobspec/loadgenerator.nomad
+  nomad job run -detach otel-demo-app/jobspec/frontendproxy.nomad
+  nomad job run -detach otel-demo-app/jobspec/grafana.nomad
+  nomad job run -detach otel-demo-app/jobspec/jaeger.nomad
+  nomad job run -detach otel-demo-app/jobspec/prometheus.nomad
   ```
 
 2. Run tests
