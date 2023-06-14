@@ -1,0 +1,23 @@
+version: "3.9"
+services:
+  k0s:
+    container_name: k0s
+    image: docker.io/k0sproject/k0s:latest
+    command: k0s controller --config=/etc/k0s/config.yaml --enable-worker
+    hostname: k0s
+    privileged: true
+    volumes:
+      - "/var/lib/k0s"
+    tmpfs:
+      - /run
+      - /var/run
+    ports:
+      - "6443:6443"
+    network_mode: "bridge"
+    environment:
+      K0S_CONFIG: |-
+        apiVersion: k0s.k0sproject.io/v1beta1
+        kind: ClusterConfig
+        metadata:
+          name: k0s
+        # Any additional configuration goes here ...
