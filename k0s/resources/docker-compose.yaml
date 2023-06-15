@@ -3,7 +3,8 @@ services:
   k0s:
     container_name: k0s
     image: docker.io/k0sproject/k0s:latest
-    command: k0s controller --config=/etc/k0s/config.yaml --enable-worker
+    # command: k0s controller --config=/etc/k0s/config.yaml --enable-worker
+    command: k0s controller --enable-worker
     hostname: k0s
     privileged: true
     volumes:
@@ -15,9 +16,10 @@ services:
       - "6443:6443"
     network_mode: "bridge"
     environment:
-      K0S_CONFIG: |-
-        apiVersion: k0s.k0sproject.io/v1beta1
-        kind: ClusterConfig
-        metadata:
-          name: k0s
-        # Any additional configuration goes here ...
+      ETCD_UNSUPPORTED_ARCH: arm64
+    #   K0S_CONFIG: |-
+    #     apiVersion: k0s.k0sproject.io/v1beta1
+    #     kind: ClusterConfig
+    #     metadata:
+    #       name: k0s
+    #     # Any additional configuration goes here ...
