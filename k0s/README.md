@@ -25,5 +25,5 @@ export ALLOCATION_ID=$(nomad job allocs -json k0s | jq -r '.[0].ID')
 nomad alloc exec $ALLOCATION_ID kubectl get ns
 
 # To add to kubectl
-nomad alloc exec $ALLOCATION_ID cat /var/lib/k0s/pki/admin.conf
+nomad alloc exec $ALLOCATION_ID cat /var/lib/k0s/pki/admin.conf > ~/.kube/config
 ```
