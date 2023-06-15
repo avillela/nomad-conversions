@@ -66,7 +66,8 @@ EOF
       }
 
       resources {
-        memory = 2048
+        cpu = 55
+        memory = 4096
       }
     }
   }

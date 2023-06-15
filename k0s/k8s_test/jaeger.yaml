@@ -3,13 +3,13 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: opentelemetry
+  name: opentelemetry-2
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: jaeger-all-in-one
-  namespace: opentelemetry
+  namespace: opentelemetry-2
   labels:
     app: opentelemetry
     component: otel-collector
@@ -26,7 +26,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: jaeger-all-in-one-ui
-  namespace: opentelemetry
+  namespace: opentelemetry-2
   labels:
     app: opentelemetry
     component: otel-collector
@@ -44,7 +44,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: jaeger-all-in-one
-  namespace: opentelemetry
+  namespace: opentelemetry-2
   labels:
     app: opentelemetry
     component: otel-collector
@@ -67,3 +67,6 @@ spec:
             - containerPort: 16686
             - containerPort: 14268
             - containerPort: 14250
+          resources:
+            limits:
+              memory: 275Mi
