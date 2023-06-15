@@ -1,0 +1,69 @@
+# jaeger.yml
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: opentelemetry
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jaeger-all-in-one
+  namespace: opentelemetry
+  labels:
+    app: opentelemetry
+    component: otel-collector
+spec:
+  ports:
+    - name: collector
+      port: 14250
+      protocol: TCP
+      targetPort: 14250
+  selector:
+    component: otel-collector
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jaeger-all-in-one-ui
+  namespace: opentelemetry
+  labels:
+    app: opentelemetry
+    component: otel-collector
+spec:
+  ports:
+    - name: jaeger
+      port: 16686
+      protocol: TCP
+      targetPort: 16686
+  selector:
+    component: otel-collector
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jaeger-all-in-one
+  namespace: opentelemetry
+  labels:
+    app: opentelemetry
+    component: otel-collector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opentelemetry
+      component: otel-collector
+  template:
+    metadata:
+      labels:
+        app: opentelemetry
+        component: otel-collector
+    spec:
+      containers:
+        - image: jaegertracing/all-in-one:1.35
+          name: jaeger
+          ports:
+            - containerPort: 16686
+            - containerPort: 14268
+            - containerPort: 14250
