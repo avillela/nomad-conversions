@@ -1,8 +1,10 @@
 # k0s in Nomad
 
+
 Your eyes do not deceive you. You can run k0s on Nomad!
 
 If you want to play with this locally on a full-fledged HashiCorp Nomad environment (with Consul and Vault), then you'll need to deploy [Hashiqube](https://github.com/servian/hashiqube) first. I suggest that deploy [my fork of Hashiqube](https://github.com/avillela/hashiqube), as it has all the configs needed to make this work.
+
 ## Run k0s using Docker
 
 This is based on the official k0s docs for [running k0s with Docker](https://docs.k0sproject.io/v1.27.2+k0s.0/k0s-in-docker/#start-k0s).
@@ -21,7 +23,11 @@ docker run -it --rm \
 docker exec k0s kubectl get pods -A -w
 docker exec k0s kubectl get nodes -w
 
-# Get kubeconfig file so you can run kubectl
+# Try some kubectl commands
+docker exec k0s kubectl get ns
+docker exec k0s kubectl get svc
+
+# Get kubeconfig file
 docker exec k0s cat /var/lib/k0s/pki/admin.conf
 ```
 

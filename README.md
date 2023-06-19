@@ -11,3 +11,4 @@ This is work in progress.
 * [OTel Demo App on Nomad](otel-demo-app/README.md)
 * [Temporal on Nomad](temporal/README.md)
 * [Tracetest on Nomad](tracetest/README.md)
+* [K0s on Nomad](k0s/README.md)
