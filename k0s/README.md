@@ -1,9 +1,8 @@
 # k0s in Nomad
 
-This is an unfinished work. Unfortunately, while the k0s job does deploy in Nomad, if you check the logs, you'll notice that the Kubelet fails to start up, and well, without the Kubelet, you don't really have Kubernetes.
+Your eyes do not deceive you. You can run k0s on Nomad!
 
-This is a work in progress, and if anyone has any insights into this issue, I am all ears!
-
+If you want to play with this locally on a full-fledged HashiCorp Nomad environment (with Consul and Vault), then you'll need to deploy [Hashiqube](https://github.com/servian/hashiqube) first. I suggest that deploy [my fork of Hashiqube](https://github.com/avillela/hashiqube), as it has all the configs needed to make this work.
 ## Run k0s using Docker
 
 This is based on the official k0s docs for [running k0s with Docker](https://docs.k0sproject.io/v1.27.2+k0s.0/k0s-in-docker/#start-k0s).
