@@ -1,8 +1,9 @@
 # k0s in Nomad
 
-This is an unfinished work. Unfortunately, while the k0s job does deploy in Nomad, if you check the logs, you'll notice that the Kubelet fails to start up, and well, without the Kubelet, you don't really have Kubernetes.
 
-This is a work in progress, and if anyone has any insights into this issue, I am all ears!
+Your eyes do not deceive you. You can run k0s on Nomad!
+
+If you want to play with this locally on a full-fledged HashiCorp Nomad environment (with Consul and Vault), then you'll need to deploy [Hashiqube](https://github.com/servian/hashiqube) first. I suggest that deploy [my fork of Hashiqube](https://github.com/avillela/hashiqube), as it has all the configs needed to make this work.
 
 ## Run k0s using Docker
 
@@ -10,14 +11,17 @@ This is based on the official k0s docs for [running k0s with Docker](https://doc
 
 ```bash
 docker run -it --rm \
-    --platform linux/amd64 \
     --name k0s --hostname k0s \
     --privileged \
-    # -e ETCD_UNSUPPORTED_ARCH=arm64 \
     --cgroupns=host -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
     -v /var/lib/k0s \
     -p 6443:6443 \
-    docker.io/k0sproject/k0s:latest
+    -e ETCD_UNSUPPORTED_ARCH=arm \
+    docker.io/k0sproject/k0s:v1.27.2-k0s.0 k0s controller --enable-worker --no-taint
+
+# Check pod and node status
+docker exec k0s kubectl get pods -A -w
+docker exec k0s kubectl get nodes -w
 
 # Try some kubectl commands
 docker exec k0s kubectl get ns
@@ -44,6 +48,10 @@ docker exec k0s cat /var/lib/k0s/pki/admin.conf
 
     # Add the k0s cluster to kubeconfig
     nomad alloc exec $ALLOCATION_ID cat /var/lib/k0s/pki/admin.conf > ~/.kube/config
+
+    # Check readiness of k0s cluster (open each in new terminal window)
+    kubectl get nodes -w
+    kubectl get pods -A -w
     ```
 
 3. Deploy Jaeger to the cluster
@@ -51,6 +59,17 @@ docker exec k0s cat /var/lib/k0s/pki/admin.conf
     >**NOTE:** This does not work, due to the Kubelet issue mentioned above. I mean, it creates the Kubernetes resources, but the deployment is perpetually left in a `pending` state.    
 
     ```bash
-    # Run test
+    # Deploy test app
     kubectl apply -f k0s/k8s_test/jaeger.yaml
     ```
+
+4. Test Jaeger
+
+    Set up port-forwarding
+
+    ```bash
+    # Set up port-forwarding
+    kubectl port-forward -n opentelemetry svc/jaeger-all-in-one-ui 16686:16686
+    ```
+
+    Jaeger should be available at http://localhost:16686.
