@@ -1,13 +1,19 @@
 # k0s in Nomad
 
 
-Your eyes do not deceive you. You can run k0s on Nomad!
+Your eyes do not deceive you. You can run Kubernetes on Nomad with k0s! K0s is a lightweight Kubernetes distro. Check it out [here](https://docs.k0sproject.io/v1.27.2+k0s.0/).
 
 If you want to play with this locally on a full-fledged HashiCorp Nomad environment (with Consul and Vault), then you'll need to deploy [Hashiqube](https://github.com/servian/hashiqube) first. I suggest that deploy [my fork of Hashiqube](https://github.com/avillela/hashiqube), as it has all the configs needed to make this work.
+
+This little experiment wouldn't have been possible without the help of [Luiz Aoqui](@lgfa29). For real. We did some serious pairing and troubleshooting on this one.
 
 ## Run k0s using Docker
 
 This is based on the official k0s docs for [running k0s with Docker](https://docs.k0sproject.io/v1.27.2+k0s.0/k0s-in-docker/#start-k0s).
+
+**NOTES:**
+* If you are using Docker Desktop as the runtime, starting from 4.3.0 version it's using cgroups v2 in the VM that runs the engine. This means you have to add some extra flags to the above command to get kubelet and containerd to properly work with cgroups v2. More info [here](https://docs.k0sproject.io/v1.27.2+k0s.0/k0s-in-docker/#1-initiate-k0s).
+* If you are running a Mac with a Silicon processor, you need to include the environment variable `-e ETCD_UNSUPPORTED_ARCH=arm`, as documented [here](https://docs.k0sproject.io/v1.27.2+k0s.0/troubleshooting/#k0s-controller-fails-on-arm-boxes).
 
 ```bash
 docker run -it --rm \
