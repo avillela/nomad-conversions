@@ -37,6 +37,16 @@ docker exec k0s kubectl get svc
 docker exec k0s cat /var/lib/k0s/pki/admin.conf
 ```
 
+## Running Nomad
+
+If you prefer to run this example locally using the Nomad binary instead of on [Hashiqube](README.md#Running-the-examples), all you need to do is start up Nomad using command below:
+
+```bash
+# Assuming you're in the nomad-conversions root directory
+nomad agent -dev -config k0s/config/config.hcl
+```
+
+
 ## Run k0s in Nomad
 
 1. Deploy the job to Nomad
