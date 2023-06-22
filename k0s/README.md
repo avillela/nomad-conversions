@@ -1,6 +1,5 @@
 # k0s in Nomad
 
-
 Your eyes do not deceive you. You can run Kubernetes on Nomad with k0s! K0s is a lightweight Kubernetes distro. Check it out [here](https://docs.k0sproject.io/v1.27.2+k0s.0/).
 
 If you want to play with this locally on a full-fledged HashiCorp Nomad environment (with Consul and Vault), then you'll need to deploy [Hashiqube](https://github.com/servian/hashiqube) first. I suggest that deploy [my fork of Hashiqube](https://github.com/avillela/hashiqube), as it has all the configs needed to make this work.
@@ -8,6 +7,8 @@ If you want to play with this locally on a full-fledged HashiCorp Nomad environm
 This little experiment wouldn't have been possible without the help of [Luiz Aoqui](https://github.com/lgfa29). For real. We did some serious pairing and troubleshooting on this one. The code in this folder based on Luiz's work [here](https://gist.github.com/lgfa29/145cc6063c1f491f1e6b3ed010bbcb45).
 
 ## Run k0s using Docker
+
+> 🚨🚨 **IMPORTANT NOTE:** Nomad doesn't currently have support for `cgroupsns`, so Luiz, who happens to be a developer on the Nomad team, created a special build for this. Note that it's not an official build...yet...maybe? You can download the binaries [here](https://github.com/hashicorp/nomad/actions/runs/5312709136).
 
 This is based on the official k0s docs for [running k0s with Docker](https://docs.k0sproject.io/v1.27.2+k0s.0/k0s-in-docker/#start-k0s).
 
