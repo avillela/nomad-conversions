@@ -1,3 +1,4 @@
+# Nomad config file if you want to run Nomad locally in dev mode
 client {
   host_volume "k0s" {
     # Adjust to your environment.
