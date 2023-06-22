@@ -34,31 +34,8 @@ job "k0s" {
 
         volumes = [
           "local/containerd.toml:/etc/k0s/containerd.toml",
+          "/sys/fs/cgroup:/sys/fs/cgroup",
         ]
-
-        mount {
-          type   = "bind"
-          source = "/sys/fs/cgroup"
-          target = "/sys/fs/cgroup"
-        }
-
-        mount {
-          type   = "tmpfs"
-          target = "/run"
-
-          tmpfs_options {
-            size = 50000000 # size in bytes
-          }
-        }
-
-        mount {
-          type   = "tmpfs"
-          target = "/var/run"
-
-          tmpfs_options {
-            size = 50000000 # size in bytes
-          }
-        }
       }
 
       template {
