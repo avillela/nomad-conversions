@@ -1,8 +1,8 @@
 # Nomad config file if you want to run Nomad locally in dev mode
 client {
   host_volume "k0s" {
-    # Adjust to your environment.
-    path = "/Users/laoqui/k0s"
+    # If the directory doesn't already exist, run: mkdir -p ~/k0s
+    path = "~/k0s"
   }
 }
 
